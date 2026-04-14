@@ -1,10 +1,10 @@
-package com.github.zhiduoming.intellgentuniversityvisitsystem;
+package com.github.zhiduoming;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class IntellgentUniversityVisitSystemApplicationTests {
+class IntelligentUniversityVisitSystemApplicationTests {
 
     @Test
     void contextLoads() {

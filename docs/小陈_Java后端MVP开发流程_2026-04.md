@@ -32,7 +32,7 @@
 2. 定义统一返回体 `Result<T>`。
 3. 接入全局异常处理。
 4. 配置文件分环境（`dev`、`prod` 至少占位）。
-5. 建 4 张核心表：`sys_user`、`core_university`、`core_campus`、`core_poi`。
+5. 建 4 张核心表：`user`、`university`、`campus`、`poi`。
 6. 插入初始化数据（两所高校、校区、POI）。
 
 完成标准：

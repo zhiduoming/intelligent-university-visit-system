@@ -85,7 +85,7 @@
 
 ### **🟢 核心表 (Core Tables)**
 
-**1\. sys\_user (用户表)**
+**1\. user (用户表)**
 
 * id (PK, BIGINT, 推荐使用 Snowflake 算法生成分布式主键)  
 * username (VARCHAR, 唯一索引)  
@@ -95,7 +95,7 @@
 * current\_uni\_id (BIGINT, 关联大学表, 在校生专属外键)  
 * *通用审计字段* (create\_time, update\_time, is\_deleted)
 
-**2\. core\_university (大学主表)**
+**2\. university (大学主表)**
 
 * id (PK, BIGINT)  
 * name (VARCHAR, 建立唯一索引 uk\_name)  
@@ -104,7 +104,7 @@
 * level\_tags (JSON 或 VARCHAR，如 \["985", "211", "双一流"\])  
 * *通用审计字段*
 
-**3\. core\_campus (校区表)**
+**3\. campus (校区表)**
 
 * id (PK, BIGINT)  
 * uni\_id (BIGINT, 建立普通索引，因为经常需要 WHERE uni\_id \= ?)  
@@ -113,7 +113,7 @@
 * lat, lng (DECIMAL(10,6), 保证坐标经纬度的足够精度)  
 * *通用审计字段*
 
-**4\. core\_poi (具体点位表)**
+**4\. poi (具体点位表)**
 
 * id (PK, BIGINT)  
 * campus\_id (BIGINT, 建立普通索引)  

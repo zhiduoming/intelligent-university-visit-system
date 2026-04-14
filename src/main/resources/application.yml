@@ -1,0 +1,15 @@
+
+spring:
+  application:
+    name: Intelligent-University-Visit-System
+  datasource:
+    url: jdbc:mysql://localhost:3306/intelligent_university_visit_system
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 2006051Chenyibo?
+
+#配置日志输出
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
