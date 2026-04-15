@@ -1,0 +1,322 @@
+openapi: 3.0.3
+info:
+  title: Intelligent University Visit System API
+  version: 1.0.0
+  description: MVP API for university-campus-poi closed loop.
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development
+tags:
+  - name: Health
+  - name: University
+  - name: POI
+  - name: Auth
+  - name: Wish
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      operationId: health
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultAny'
+              example:
+                code: 1
+                msg: success
+                data: ok
+  /universities:
+    get:
+      tags: [University]
+      summary: List universities
+      operationId: listUniversities
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultAny'
+  /universities/{universityId}:
+    get:
+      tags: [University]
+      summary: Get university detail with campuses
+      operationId: getUniversityDetail
+      parameters:
+        - name: universityId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultAny'
+              example:
+                code: 1
+                msg: success
+                data:
+                  id: 1
+                  name: 北京邮电大学
+                  shortName: 北邮
+                  description: 信息与通信特色高校，MVP重点完善数据。
+                  logoUrl: https://www.bupt.edu.cn
+                  officialWebsite: https://www.bupt.edu.cn
+                  is985: 1
+                  is211: 1
+                  isDoubleFirstClass: 1
+                  schoolType: 理工
+                  province: 北京
+                  city: 北京
+                  campusList:
+                    - id: 1
+                      uniId: 1
+                      name: 西土城校区
+                      address: 北京市海淀区西土城路10号
+                      hotScore: 95
+  /campuses/{campusId}/pois:
+    get:
+      tags: [POI]
+      summary: List POIs by campus
+      operationId: listPoisByCampusId
+      parameters:
+        - name: campusId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: integer
+            enum: [1, 2, 3, 4]
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            default: hotScoreDesc
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultAny'
+  /pois/{poiId}:
+    get:
+      tags: [POI]
+      summary: Get POI detail
+      operationId: getPoiDetail
+      parameters:
+        - name: poiId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultAny'
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register user
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultAny'
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login user
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultAny'
+  /users/me:
+    get:
+      tags: [Auth]
+      summary: Get current user
+      operationId: getCurrentUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultAny'
+  /wishes:
+    post:
+      tags: [Wish]
+      summary: Create wish
+      operationId: createWish
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWishRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultAny'
+  /universities/{universityId}/wishes:
+    get:
+      tags: [Wish]
+      summary: List wishes by university
+      operationId: listWishesByUniversityId
+      parameters:
+        - name: universityId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultAny'
+  /wishes/{wishId}:
+    delete:
+      tags: [Wish]
+      summary: Delete wish
+      operationId: deleteWish
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: wishId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultAny'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ResultAny:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 1
+        msg:
+          type: string
+          example: success
+        data:
+          nullable: true
+    RegisterRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          example: xiaochen
+        password:
+          type: string
+          example: "12345678"
+        nickname:
+          type: string
+          example: 小陈
+        identityType:
+          type: integer
+          example: 2
+        targetUniId:
+          type: integer
+          format: int64
+          nullable: true
+        currentUniId:
+          type: integer
+          format: int64
+          nullable: true
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          example: xiaochen
+        password:
+          type: string
+          example: "12345678"
+    CreateWishRequest:
+      type: object
+      required: [universityId, content]
+      properties:
+        universityId:
+          type: integer
+          format: int64
+          example: 1
+        content:
+          type: string
+          example: 明年一定上岸北邮！
+        color:
+          type: string
+          example: "#FFD966"
