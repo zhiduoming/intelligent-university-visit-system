@@ -6,22 +6,19 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class University {
+public class Poi {
     private Long id;
+    private Long campus_id;
     private String name;
-    private String shortName;
-    private String description;
-    private String logoUrl;
-    private String officialWebsite;
-    private Integer is985;
-    private Integer is211;
-    private Integer isDoubleFirstClass;
-    private String schoolType;
-    private String province;
-    private String city;
+    private Integer category;
+    private Integer suggestedDuration;
+    private String intro;
+    private String imageUrl;
+    private String hotScore;
+    private Integer dataStatus;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
     private Integer isDeleted;

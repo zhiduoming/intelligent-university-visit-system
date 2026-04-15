@@ -9,19 +9,19 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class University {
+public class Campus {
     private Long id;
+    private Long uniId;
     private String name;
-    private String shortName;
-    private String description;
-    private String logoUrl;
-    private String officialWebsite;
-    private Integer is985;
-    private Integer is211;
-    private Integer isDoubleFirstClass;
-    private String schoolType;
+    private String address;
     private String province;
     private String city;
+    private Double lat;
+    private Double lng;
+    private String description;
+    private String mainGate;
+    private Integer hotScore;
+    private Integer dataStatus;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
     private Integer isDeleted;

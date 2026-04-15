@@ -1,7 +1,11 @@
 package com.github.zhiduoming.common;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class Result {
     private Integer code; //编码：1成功，0为失败

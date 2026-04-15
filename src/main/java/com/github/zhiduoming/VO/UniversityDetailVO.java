@@ -1,15 +1,15 @@
-package com.github.zhiduoming.pojo;
+package com.github.zhiduoming.VO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
-public class University {
+public class UniversityDetailVO {
     private Long id;
     private String name;
     private String shortName;
@@ -22,7 +22,5 @@ public class University {
     private String schoolType;
     private String province;
     private String city;
-    private LocalDateTime createTime;
-    private LocalDateTime updateTime;
-    private Integer isDeleted;
+    private List<CampusVO> campusList;
 }
