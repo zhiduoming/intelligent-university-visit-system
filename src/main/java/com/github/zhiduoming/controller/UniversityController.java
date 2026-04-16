@@ -1,14 +1,14 @@
 package com.github.zhiduoming.controller;
 
+import com.github.zhiduoming.DTO.UniversityPageQuery;
 import com.github.zhiduoming.VO.UniversityDetailVO;
 import com.github.zhiduoming.VO.UniversityListVO;
+import com.github.zhiduoming.common.PageResult;
 import com.github.zhiduoming.common.Result;
 import com.github.zhiduoming.service.UniversityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -20,10 +20,11 @@ public class UniversityController {
 
 
     @GetMapping
-    public Result listUniversities(){
-        log.info("查询所有大学信息");
-        List<UniversityListVO> universityList= universityService.listUniversities();
-        return Result.success(universityList);
+    public Result listUniversities(@ModelAttribute UniversityPageQuery query){
+        log.info("查询所有大学信息,page={},size={},keyword={},province={}",
+                query.getPage(),query.getSize(),query.getKeyword(),query.getProvince());
+        PageResult<UniversityListVO> pageResult = universityService.listUniversities(query);
+        return Result.success(pageResult);
     }
 
     @GetMapping("/{universityId}")

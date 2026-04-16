@@ -17,7 +17,7 @@ public class PoiServiceImpl implements PoiService {
 
 
     @Override
-    public List<PoiVO> listPoiByCampusId(Long campusId) {
+    public List<PoiVO> listPoisByCampusId(Long campusId) {
        return poiMapper.selectPoisByCampusId(campusId);
     }
 }
