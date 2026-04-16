@@ -21,8 +21,8 @@ public class UniversityController {
 
     @GetMapping
     public Result listUniversities(@ModelAttribute UniversityPageQuery query){
-        log.info("查询所有大学信息,page={},size={},keyword={},province={}",
-                query.getPage(),query.getSize(),query.getKeyword(),query.getProvince());
+        log.info("查询所有大学信息,page={},size={},keyword={},province={},city={}",
+                query.getPage(),query.getSize(),query.getKeyword(),query.getProvince(),query.getCity());
         PageResult<UniversityListVO> pageResult = universityService.listUniversities(query);
         return Result.success(pageResult);
     }

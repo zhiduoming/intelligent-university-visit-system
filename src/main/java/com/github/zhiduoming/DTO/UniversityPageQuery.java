@@ -8,6 +8,7 @@ public class UniversityPageQuery {
     private Integer size = 10;
     private String keyword;
     private String province;
+    private String city;
 
     //保证page传递的安全
     public int safePage() {

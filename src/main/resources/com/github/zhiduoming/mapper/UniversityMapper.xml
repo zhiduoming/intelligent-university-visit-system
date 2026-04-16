@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.zhiduoming.mapper.UniversityMapper">
+
+    <select id="selectUniversityById" resultType="com.github.zhiduoming.VO.UniversityDetailVO">
+        SELECT id,
+               name,
+               short_name,
+               description,
+               logo_url,
+               official_website,
+               is_985,
+               is_211,
+               is_double_first_class,
+               school_type,
+               province,
+               city
+        FROM university
+        WHERE is_deleted = 0
+          AND id = #{universityId}
+    </select>
+
+    <select id="selectUniversityList" resultType="com.github.zhiduoming.VO.UniversityListVO">
+        SELECT id,
+               name,
+               short_name,
+               description,
+               logo_url,
+               official_website,
+               is_985,
+               is_211,
+               is_double_first_class,
+               school_type,
+               province,
+               city
+        FROM university
+        <where>
+            is_deleted = 0
+            <if test="keyword != null and keyword != ''">
+                AND (name LIKE CONCAT('%', #{keyword}, '%')
+                OR short_name LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="province != null and province != ''">
+                AND province = #{province}
+            </if>
+            <if test="city != null and city != ''">
+                AND city = #{city}
+            </if>
+        </where>
+        ORDER BY id
+    </select>
+</mapper>

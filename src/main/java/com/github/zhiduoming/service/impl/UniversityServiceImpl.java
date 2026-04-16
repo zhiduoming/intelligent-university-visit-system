@@ -36,9 +36,10 @@ public class UniversityServiceImpl implements UniversityService {
         int size = (query == null) ? 10 : query.safeSize();
         String keyword = (query == null) ? null : query.getKeyword();
         String province = (query == null) ? null : query.getProvince();
+        String city = (query == null) ? null : query.getCity();
 
         PageHelper.startPage(page, size);
-        List<UniversityListVO> universityList = universityMapper.selectUniversityList(keyword, province);
+        List<UniversityListVO> universityList = universityMapper.selectUniversityList(keyword, province, city);
         PageInfo<UniversityListVO> pageInfo = new PageInfo<>(universityList);
 
         return new PageResult<>(
