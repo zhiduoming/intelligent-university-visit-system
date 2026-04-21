@@ -1,0 +1,500 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniTour · 智能高校攻略引擎</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #08101d;
+      --surface: #12223a;
+      --line: #2a4365;
+      --text: #ecf3ff;
+      --muted: #9db0d3;
+      --primary: #31cba4;
+      --accent: #ffb864;
+      --ok: #78efc3;
+      --dev: #8ec5ff;
+      --plan: #ffd89a;
+      --radius: 16px;
+      --shadow: 0 20px 48px rgba(3, 8, 16, 0.44);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: "Noto Sans SC", sans-serif;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(52, 98, 160, 0.34), rgba(52, 98, 160, 0) 46%),
+        radial-gradient(circle at 87% 4%, rgba(255, 184, 100, 0.18), rgba(255, 184, 100, 0) 32%),
+        linear-gradient(180deg, #070f1a 0%, #08101d 100%);
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+      background: rgba(8, 14, 25, 0.78);
+      border-bottom: 1px solid rgba(106, 140, 184, 0.24);
+    }
+
+    .topbar-inner, .hero, .shell, .footer {
+      width: min(1240px, 94vw);
+      margin: 0 auto;
+    }
+
+    .topbar-inner {
+      min-height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding: 10px 0;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+      font-family: "Plus Jakarta Sans", "Noto Sans SC", sans-serif;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .logo {
+      width: 33px;
+      height: 33px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--primary), #6bdfff);
+      color: #07221c;
+      box-shadow: 0 10px 20px rgba(49, 203, 164, 0.34);
+      font-weight: 900;
+    }
+
+    .quick-nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .quick-nav a {
+      color: #d8e7ff;
+      text-decoration: none;
+      border: 1px solid rgba(138, 170, 212, 0.35);
+      border-radius: 999px;
+      padding: 6px 11px;
+      font-size: 0.8rem;
+    }
+
+    .hero-wrap {
+      border-bottom: 1px solid rgba(104, 138, 180, 0.23);
+      background:
+        linear-gradient(105deg, rgba(8, 17, 31, 0.87) 18%, rgba(8, 17, 31, 0.38) 64%, rgba(8, 17, 31, 0.91) 100%),
+        url("https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1700&q=80") center/cover no-repeat;
+    }
+
+    .hero {
+      min-height: 48svh;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      align-items: end;
+      gap: 20px;
+      padding: 30px 0 26px;
+    }
+
+    .kicker {
+      display: inline-block;
+      font-size: 0.76rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(150, 182, 226, 0.45);
+      background: rgba(11, 25, 45, 0.52);
+      color: #d8e8ff;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "Plus Jakarta Sans", "Noto Sans SC", sans-serif;
+      font-size: clamp(1.8rem, 3.6vw, 2.9rem);
+      line-height: 1.1;
+    }
+
+    .hero p {
+      margin: 12px 0 0;
+      max-width: 620px;
+      color: #d3e3ff;
+      line-height: 1.72;
+    }
+
+    .cta {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-family: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      transition: .17s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-main {
+      background: linear-gradient(90deg, var(--primary), #59dfbe);
+      color: #06211a;
+      box-shadow: 0 12px 22px rgba(49, 203, 164, 0.32);
+    }
+
+    .btn-sub {
+      background: rgba(12, 25, 45, 0.62);
+      border: 1px solid rgba(150, 182, 226, 0.45);
+      color: #e2eeff;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .hero-side {
+      border: 1px solid rgba(145, 176, 219, 0.35);
+      border-radius: var(--radius);
+      background: linear-gradient(160deg, rgba(12, 23, 39, 0.86), rgba(11, 22, 38, 0.94));
+      box-shadow: var(--shadow);
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .hero-side strong { font-size: 0.92rem; }
+
+    .mini {
+      border: 1px solid rgba(126, 157, 200, 0.27);
+      border-radius: 10px;
+      background: rgba(8, 18, 32, 0.52);
+      padding: 8px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 5px rgba(120, 239, 199, 0.16); }
+
+    .shell {
+      padding: 18px 0 26px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .section {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(165deg, rgba(17, 32, 54, 0.93), rgba(11, 22, 38, 0.98));
+      box-shadow: var(--shadow);
+      padding: 12px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity .45s ease, transform .45s ease;
+    }
+
+    .section.show { opacity: 1; transform: translateY(0); }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-family: "Plus Jakarta Sans", "Noto Sans SC", sans-serif;
+      font-size: 1.03rem;
+    }
+
+    .sub { color: var(--muted); font-size: 0.84rem; }
+
+    .modules {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .module-card {
+      border: 1px solid #345279;
+      border-radius: 12px;
+      background: rgba(8, 17, 31, 0.58);
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .module-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .module-title { font-weight: 800; }
+
+    .tag {
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 0.73rem;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+
+    .tag.online { color: #bafbe8; border-color: rgba(49,203,164,.45); background: rgba(49,203,164,.12); }
+    .tag.dev { color: #d8ebff; border-color: rgba(142,197,255,.45); background: rgba(142,197,255,.12); }
+    .tag.plan { color: #ffe4b4; border-color: rgba(255,184,100,.45); background: rgba(255,184,100,.12); }
+
+    .module-desc { color: var(--muted); font-size: 0.82rem; line-height: 1.55; min-height: 46px; }
+
+    .module-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .module-actions a {
+      text-decoration: none;
+      border: 1px solid #3d587f;
+      border-radius: 8px;
+      color: #dff0ff;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      background: #11223a;
+    }
+
+    .module-actions a.primary {
+      border: 0;
+      color: #05211a;
+      background: linear-gradient(90deg, var(--primary), #58debd);
+    }
+
+    .roadmap {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .step {
+      border: 1px solid #355279;
+      border-radius: 11px;
+      background: rgba(8, 16, 29, 0.66);
+      padding: 8px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .step small { color: var(--muted); font-size: 0.74rem; }
+    .step strong { font-size: 0.87rem; }
+
+    .news {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .news-card {
+      border: 1px solid #355279;
+      border-radius: 11px;
+      background: rgba(8, 16, 29, 0.66);
+      padding: 9px;
+      color: var(--muted);
+      font-size: 0.83rem;
+      line-height: 1.58;
+    }
+
+    .news-card strong { color: var(--text); display: block; margin-bottom: 4px; }
+
+    .footer {
+      margin: 10px auto 24px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 1080px) {
+      .hero, .modules, .roadmap, .news { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 680px) {
+      .quick-nav { width: 100%; }
+      .quick-nav a { flex: 1 1 auto; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/index.html"><span class="logo">U</span><span>UniTour</span></a>
+    <nav class="quick-nav">
+      <a href="#modules">业务模块</a>
+      <a href="#roadmap">路线图</a>
+      <a href="#news">项目资讯</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero-wrap">
+  <div class="hero">
+    <div>
+      <span class="kicker">Intelligent University Visit System</span>
+      <h1>首页负责“讲清产品与模块”<br>功能页负责“承载具体业务流程”</h1>
+      <p>
+        你说的方向完全正确：这个首页只做产品介绍、业务分类导航和项目进展说明。
+        具体查询、详情、POI 等能力放在子页面承载，后续模块可以持续按页扩展。
+      </p>
+      <div class="cta">
+        <a class="btn btn-main" href="/universities.html">进入高校探索页</a>
+        <a class="btn btn-sub" href="#modules">查看业务模块</a>
+      </div>
+    </div>
+
+    <aside class="hero-side">
+      <strong>当前进展快照</strong>
+      <div class="mini"><span>高校分页检索</span><span class="dot"></span></div>
+      <div class="mini"><span>大学详情 + 校区</span><span class="dot"></span></div>
+      <div class="mini"><span>校区 POI 导览</span><span class="dot"></span></div>
+      <div class="mini"><span>认证与愿望墙接入中</span><span class="dot"></span></div>
+    </aside>
+  </div>
+</section>
+
+<main class="shell">
+  <section class="section" id="modules">
+    <div class="section-head">
+      <div>
+        <h2>主要业务模块</h2>
+        <div class="sub">模块先预留页面入口，功能按迭代逐步补齐。</div>
+      </div>
+    </div>
+
+    <div class="modules">
+      <article class="module-card">
+        <div class="module-top"><span class="module-title">高校探索</span><span class="tag online">已上线</span></div>
+        <div class="module-desc">高校分页检索、大学详情查看、校区数据下钻。</div>
+        <div class="module-actions">
+          <a class="primary" href="/universities.html">进入模块</a>
+        </div>
+      </article>
+
+      <article class="module-card">
+        <div class="module-top"><span class="module-title">校区 POI 导览</span><span class="tag dev">开发中</span></div>
+        <div class="module-desc">按校区拉取点位，支持分类和排序策略，承载路线规划前置数据。</div>
+        <div class="module-actions">
+          <a href="/campus-pois.html">模块预留页</a>
+        </div>
+      </article>
+
+      <article class="module-card">
+        <div class="module-top"><span class="module-title">认证中心</span><span class="tag dev">开发中</span></div>
+        <div class="module-desc">注册、登录、JWT、当前用户信息与权限基础能力。</div>
+        <div class="module-actions">
+          <a href="/auth-center.html">模块预留页</a>
+        </div>
+      </article>
+
+      <article class="module-card">
+        <div class="module-top"><span class="module-title">愿望墙社区</span><span class="tag dev">开发中</span></div>
+        <div class="module-desc">发布愿望、按高校分页查询、本人删除，形成基础 UGC 交互。</div>
+        <div class="module-actions">
+          <a href="/wishes.html">模块预留页</a>
+        </div>
+      </article>
+
+      <article class="module-card">
+        <div class="module-top"><span class="module-title">评价中台</span><span class="tag plan">规划中</span></div>
+        <div class="module-desc">统一 target_type / target_id 的多态评分体系，支持高校与 POI 评价。</div>
+        <div class="module-actions">
+          <a href="/reviews.html">模块预留页</a>
+        </div>
+      </article>
+
+      <article class="module-card">
+        <div class="module-top"><span class="module-title">开放日看板</span><span class="tag plan">规划中</span></div>
+        <div class="module-desc">聚合高校开放日与预约信息，提供择校时效性资讯入口。</div>
+        <div class="module-actions">
+          <a href="/open-day.html">模块预留页</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="roadmap">
+    <div class="section-head">
+      <div>
+        <h2>迭代路线图</h2>
+        <div class="sub">首页展示阶段与节奏，便于你投递时讲“产品是如何一步步长出来的”。</div>
+      </div>
+    </div>
+
+    <div class="roadmap">
+      <article class="step"><small>Phase 1</small><strong>核心查询链路闭环</strong><span class="sub">高校列表、详情、POI</span></article>
+      <article class="step"><small>Phase 2</small><strong>认证体系接入</strong><span class="sub">注册登录 + JWT</span></article>
+      <article class="step"><small>Phase 3</small><strong>愿望墙模块上线</strong><span class="sub">发/查/删 + 分页</span></article>
+      <article class="step"><small>Phase 4</small><strong>投递强化与部署</strong><span class="sub">云部署 + README 叙事</span></article>
+    </div>
+  </section>
+
+  <section class="section" id="news">
+    <div class="section-head">
+      <div>
+        <h2>项目资讯位（首页信息区）</h2>
+        <div class="sub">你后续可以把这里接成真实公告、版本日志、开放日资讯。</div>
+      </div>
+    </div>
+
+    <div class="news">
+      <article class="news-card"><strong>版本更新</strong>本周已完成高校分页检索与多条件过滤，解决查询链路的可扩展问题。</article>
+      <article class="news-card"><strong>数据建设</strong>已沉淀北邮与北航的核心校区数据，并为 POI 分类与时长字段预留路线规划基础。</article>
+      <article class="news-card"><strong>下一目标</strong>优先接入认证和愿望墙 CRUD，形成“查询 + 用户 + 互动”的最小产品闭环。</article>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <span>UniTour Home · Product Navigation Portal</span>
+  <span>首页只负责产品信息与模块入口</span>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add("show");
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.section').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
