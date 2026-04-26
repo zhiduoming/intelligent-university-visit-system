@@ -14,6 +14,9 @@ public class CampusServiceImpl implements CampusService {
     @Autowired
     private CampusMapper campusMapper;
 
+    /**
+     * 根据校区 ID 查询校区记录。
+     */
     @Override
     public List<Campus> findAllCampus(Long id) {
         return campusMapper.findAll(id);

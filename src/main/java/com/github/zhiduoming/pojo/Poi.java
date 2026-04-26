@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Poi {
     private Long id;
-    private Long campus_id;
+    private Long campusId;
     private String name;
     private Integer category;
     private Integer suggestedDuration;
     private String intro;
     private String imageUrl;
-    private String hotScore;
+    private Integer hotScore;
     private Integer dataStatus;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;

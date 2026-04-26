@@ -1,4 +1,4 @@
-package com.github.zhiduoming.VO;
+package com.github.zhiduoming.vo;
 
 
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class CampusVO {
     private Long id;
-    private Long uniId;
+    private Long universityId;
     private String name;
     private String address;
     private Integer hotScore;

@@ -1,4 +1,4 @@
-package com.github.zhiduoming.VO;
+package com.github.zhiduoming.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,7 +20,10 @@ public class UniversityDetailVO {
     private Integer is211;
     private Integer isDoubleFirstClass;
     private String schoolType;
+    private String educationLevel;
+    private String tags;
     private String province;
     private String city;
     private List<CampusVO> campusList;
+    private UniversityRatingVO rating;
 }

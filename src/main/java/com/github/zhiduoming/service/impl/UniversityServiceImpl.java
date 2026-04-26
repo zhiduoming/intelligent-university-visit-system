@@ -2,10 +2,11 @@ package com.github.zhiduoming.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.github.zhiduoming.DTO.UniversityPageQuery;
-import com.github.zhiduoming.VO.CampusVO;
-import com.github.zhiduoming.VO.UniversityDetailVO;
-import com.github.zhiduoming.VO.UniversityListVO;
+import com.github.zhiduoming.dto.UniversityPageQuery;
+import com.github.zhiduoming.vo.CampusVO;
+import com.github.zhiduoming.vo.UniversityDetailVO;
+import com.github.zhiduoming.vo.UniversityListVO;
+import com.github.zhiduoming.vo.UniversityRatingVO;
 import com.github.zhiduoming.common.PageResult;
 import com.github.zhiduoming.mapper.CampusMapper;
 import com.github.zhiduoming.mapper.UniversityMapper;
@@ -50,7 +51,9 @@ public class UniversityServiceImpl implements UniversityService {
         );
     }
 
-
+    /**
+     * 查询高校详情，并补齐校区列表和评分信息。
+     */
     @Override
     public UniversityDetailVO getUniversityDetail(Long universityId) {
         UniversityDetailVO universityDetail = universityMapper.selectUniversityById(universityId);
@@ -59,6 +62,8 @@ public class UniversityServiceImpl implements UniversityService {
         }
         List<CampusVO> campusList = campusMapper.selectCampusesByUniversityId(universityId);
         universityDetail.setCampusList(campusList);
+        UniversityRatingVO rating = universityMapper.selectUniversityRating(universityId);
+        universityDetail.setRating(rating);
         return universityDetail;
     }
 

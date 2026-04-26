@@ -1,4 +1,4 @@
-package com.github.zhiduoming.VO;
+package com.github.zhiduoming.vo;
 
 
 import lombok.AllArgsConstructor;

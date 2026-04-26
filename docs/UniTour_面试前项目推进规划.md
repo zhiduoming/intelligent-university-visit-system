@@ -26,7 +26,7 @@
 6. 高校详情接口可用
 7. 高校详情能返回校区列表
 8. 高校详情能返回多维评分
-9. 登录用户能发布评价
+9. 登录且资料已完善的用户能发布评价
 10. 用户能查看高校评价列表
 11. 用户能删除自己的评价
 12. Redis 能缓存高校详情
@@ -92,19 +92,28 @@ UniTour 的定位：
 
 建议时间：0.5-1 天
 
+当前状态：已基本完成。
+
+已完成：
+
+- 已创建 `uni_tour` 数据库
+- 核心表包括 `university`、`campus`、`poi`、`users`、`university_review`
+- V1 评分暂时基于 `university_review` 动态 AVG 聚合
+- 暂不引入 `university_rating_summary`
+
 目标：
 
 - 更新 docs 中的项目定位
 - 明确 V1 只做高校多维画像和评价闭环
 - 设计或调整核心表结构
 
-需要完成：
+已完成项：
 
-1. 更新 `docs/当前选定范围.md`
-2. 更新 `docs/一周冲刺接口文档_v1.md` 或新增 v2 文档
+1. 更新当前需求文档和推进规划
+2. 新建 `uni_tour` 数据库设计
 3. 设计 `university_review` 表
-4. 确认是否第一版使用实时 AVG 计算评分
-5. 确认 Redis key 设计
+4. 确认第一版使用实时 AVG 计算评分
+5. 确认 Redis key 设计：`iuvs:university:detail:{universityId}`
 
 完成标准：
 
@@ -141,6 +150,15 @@ GET /api/v1/users/me
 10. LoginCheckInterceptor
 11. WebConfig
 12. CurrentUserContext 或 ThreadLocal，可选
+13. 用户资料完善接口 `PUT /api/v1/users/me/profile`
+
+当前状态：
+
+- 已完成：注册、登录、JWT 生成、JWT 拦截器、`GET /api/v1/users/me`
+- 已完成：公开浏览接口放行，未登录用户可以浏览高校和校区 POI
+- 待完成：用户资料完善接口
+- 待完成：`profileCompleted` 字段或动态判断规则
+- 待完成：发布评价前的资料完善校验
 
 技术要求：
 
@@ -148,6 +166,9 @@ GET /api/v1/users/me
 - JWT 中只放 userId、username 等非敏感信息
 - `/api/v1/auth/register` 和 `/api/v1/auth/login` 放行
 - `/api/v1/users/me` 需要登录
+- 注册阶段只收集 username / password / nickname
+- 个人资料通过登录后的资料接口补充
+- 资料完善模块完成后，`/api/v1/users/me` 返回 `profileCompleted`
 
 完成标准：
 
@@ -157,6 +178,8 @@ GET /api/v1/users/me
 - 密码错误登录失败
 - 不带 token 访问 `/users/me` 失败
 - 带正确 token 访问 `/users/me` 成功
+- 未完善资料的登录用户能浏览，但不能发布评价
+- 完善资料后，用户可以参与发布评价等贡献型行为
 
 面试必须能讲：
 
@@ -165,10 +188,28 @@ GET /api/v1/users/me
 - token 放在哪里
 - JWT 里不能放什么
 - 拦截器如何放行登录接口
+- 为什么把轻量注册和资料完善拆开
 
 ## Phase 3：高校查询主链路整理
 
 建议时间：2 天
+
+当前状态：主查询链路大部分完成，POI 详情待补。
+
+已完成：
+
+- 高校列表分页查询
+- keyword / province / city 查询
+- 高校详情查询
+- 高校详情返回校区列表
+- 高校详情返回多维评分
+- 按校区查询 POI 列表
+- `/api/v1` 路径兼容
+
+待完成：
+
+- POI 详情接口 `GET /api/v1/pois/{poiId}`
+- 逐步将 `CampusMapper`、`PoiMapper` 的注解 SQL 迁移到 XML
 
 目标：
 
@@ -254,6 +295,7 @@ DELETE /api/v1/reviews/{reviewId}
 业务规则：
 
 - 发布评价必须登录
+- 发布评价要求用户资料已完善
 - 删除评价必须登录
 - 用户只能删除自己的评价
 - 删除使用逻辑删除
@@ -262,7 +304,8 @@ DELETE /api/v1/reviews/{reviewId}
 
 完成标准：
 
-- 登录用户能发布评价
+- 登录且资料已完善的用户能发布评价
+- 未完善资料的登录用户只能浏览评论区，不能发布评价
 - 高校详情能显示评分
 - 评价列表能分页
 - 用户不能删除别人的评价
@@ -404,11 +447,14 @@ README 必须包括：
 - 完成 JWT 注册登录
 - 完成 `/users/me`
 - 整理高校列表、详情、校区、POI 接口
+- 补齐用户资料完善设计与接口
 
 ### 第 2 周
 
-重点：评分评价
+重点：资料完善 + 评分评价
 
+- 完成用户资料完善
+- 明确发布评价前的资料完善校验
 - 建评价表
 - 发布评价
 - 查询评价列表
@@ -564,4 +610,3 @@ README 可读
 ```
 
 做到这一步，UniTour 就可以作为你的主简历项目。
-

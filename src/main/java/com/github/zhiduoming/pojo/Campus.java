@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Data
 public class Campus {
     private Long id;
-    private Long uniId;
+    private Long universityId;
     private String name;
     private String address;
     private String province;

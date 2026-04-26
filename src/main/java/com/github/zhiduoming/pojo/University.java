@@ -20,6 +20,8 @@ public class University {
     private Integer is211;
     private Integer isDoubleFirstClass;
     private String schoolType;
+    private String educationLevel;
+    private String tags;
     private String province;
     private String city;
     private LocalDateTime createTime;

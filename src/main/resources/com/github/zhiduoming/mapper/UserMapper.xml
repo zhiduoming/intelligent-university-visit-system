@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.zhiduoming.mapper.UserMapper">
+    <insert id="insert" parameterType="com.github.zhiduoming.pojo.User">
+        INSERT INTO users (username,password,nickname)
+        VALUES (#{username},#{password},#{nickname});
+    </insert>
+
+    <select id="selectByUsername" resultType="com.github.zhiduoming.pojo.User">
+        SELECT id,
+        username,
+        password,
+        nickname,
+        avatar_url,
+        role,
+        identity_type,
+        high_school,
+        target_uni_id,
+        current_uni_id,
+        profile_completed,
+        status,
+        create_time,
+        update_time,
+        is_deleted
+        FROM users
+        WHERE username = #{username}
+        AND is_deleted = 0
+        LIMIT 1
+    </select>
+    <select id="selectById" resultType="com.github.zhiduoming.pojo.User">
+        SELECT id,
+        username,
+        nickname,
+        avatar_url,
+        role,
+        identity_type,
+        high_school,
+        target_uni_id,
+        current_uni_id,
+        profile_completed,
+        status,
+        create_time,
+        update_time,
+        is_deleted
+        FROM users
+        WHERE id = #{id}
+        AND is_deleted = 0
+        LIMIT 1
+    </select>
+
+    <update id="updateProfile" parameterType="com.github.zhiduoming.pojo.User">
+        UPDATE users
+        SET nickname = #{nickname},
+            identity_type = #{identityType},
+            high_school = #{highSchool},
+            target_uni_id = #{targetUniId},
+            current_uni_id = #{currentUniId},
+            profile_completed = #{profileCompleted}
+        WHERE id = #{id}
+          AND is_deleted = 0
+    </update>
+</mapper>

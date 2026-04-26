@@ -1,9 +1,11 @@
-package com.github.zhiduoming.VO;
+package com.github.zhiduoming.vo;
 
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,6 +21,10 @@ public class UniversityListVO {
     private Integer is211;
     private Integer isDoubleFirstClass;
     private String schoolType;
+    private String educationLevel;
+    private String tags;
     private String province;
     private String city;
+    private BigDecimal overallScore;
+    private Long reviewCount;
 }
