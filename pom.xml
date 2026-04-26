@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.github.zhiduoming</groupId>
-    <artifactId>Intelligent-University-Visit-System</artifactId>
+    <artifactId>iuvs</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Intelligent-University-Visit-System</name>
     <description>Intelligent-University-Visit-System</description>
