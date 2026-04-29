@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.zhiduoming.mapper.ReviewMapper">
+
+
+    <insert id="insertReview" parameterType="com.github.zhiduoming.pojo.UniversityReview"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO university_review (
+            user_id,
+            university_id,
+            campus_id,
+            content,
+            dormitory_score,
+            canteen_score,
+            location_score,
+            study_score,
+            culture_score,
+            club_score,
+            employment_score,
+            campus_score,
+            overall_score,
+            is_anonymous
+        )
+        VALUES (
+            #{userId},
+            #{universityId},
+            #{campusId},
+            #{content},
+            #{dormitoryScore},
+            #{canteenScore},
+            #{locationScore},
+            #{studyScore},
+            #{cultureScore},
+            #{clubScore},
+            #{employmentScore},
+            #{campusScore},
+            #{overallScore},
+            #{isAnonymous}
+        )
+    </insert>
+
+    <select id="selectReviewsByUniversityId" resultType="com.github.zhiduoming.vo.ReviewVO">
+        SELECT r.id,
+               r.user_id,
+               CASE
+                   WHEN r.is_anonymous = 1 THEN '匿名用户'
+                   ELSE COALESCE(u.nickname, u.username)
+                   END AS nickname,
+               r.university_id,
+               r.campus_id,
+               c.name AS campus_name,
+               r.content,
+               r.dormitory_score,
+               r.canteen_score,
+               r.location_score,
+               r.study_score,
+               r.culture_score,
+               r.club_score,
+               r.employment_score,
+               r.campus_score,
+               r.overall_score,
+               r.is_anonymous,
+               r.create_time,
+               (
+                   SELECT COUNT(*)
+                   FROM review_like rl
+                   WHERE rl.review_id = r.id
+               ) AS like_count,
+               (
+                   SELECT COUNT(*)
+                   FROM review_reply rr
+                   WHERE rr.review_id = r.id
+                     AND rr.is_deleted = 0
+               ) AS reply_count,
+               CASE
+                   WHEN #{currentUserId} IS NULL THEN 0
+                   WHEN EXISTS (
+                       SELECT 1
+                       FROM review_like current_like
+                       WHERE current_like.review_id = r.id
+                         AND current_like.user_id = #{currentUserId}
+                   ) THEN 1
+                   ELSE 0
+                   END AS liked_by_current_user
+        FROM university_review r
+                 LEFT JOIN users u ON r.user_id = u.id
+                 LEFT JOIN campus c ON r.campus_id = c.id
+        WHERE r.university_id = #{universityId}
+          AND r.is_deleted = 0
+        ORDER BY r.create_time DESC, r.id DESC
+    </select>
+
+    <select id="selectRepliesByReviewIds" resultType="com.github.zhiduoming.vo.ReviewReplyVO">
+        SELECT rr.id,
+               rr.review_id,
+               rr.user_id,
+               COALESCE(u.nickname, u.username) AS nickname,
+               rr.content,
+               rr.create_time
+        FROM review_reply rr
+                 LEFT JOIN users u ON rr.user_id = u.id
+        WHERE rr.is_deleted = 0
+          AND rr.review_id IN
+        <foreach collection="reviewIds" item="reviewId" open="(" separator="," close=")">
+            #{reviewId}
+        </foreach>
+        ORDER BY rr.create_time ASC, rr.id ASC
+    </select>
+
+    <select id="selectReviewById" resultType="com.github.zhiduoming.pojo.UniversityReview">
+        SELECT id,
+               user_id,
+               university_id,
+               campus_id,
+               content,
+               dormitory_score,
+               canteen_score,
+               location_score,
+               study_score,
+               culture_score,
+               club_score,
+               employment_score,
+               campus_score,
+               overall_score,
+               is_anonymous,
+               create_time,
+               update_time,
+               is_deleted
+        FROM university_review
+        WHERE id = #{reviewId}
+        LIMIT 1
+    </select>
+
+    <update id="logicDeleteReviewByIdAndUserId">
+        UPDATE university_review
+        SET is_deleted = 1
+        WHERE id = #{reviewId}
+          AND user_id = #{userId}
+          AND is_deleted = 0
+    </update>
+
+    <insert id="insertLike">
+        INSERT IGNORE INTO review_like (review_id, user_id)
+        VALUES (#{reviewId}, #{userId})
+    </insert>
+
+    <delete id="deleteLike">
+        DELETE FROM review_like
+        WHERE review_id = #{reviewId}
+          AND user_id = #{userId}
+    </delete>
+
+    <insert id="insertReply" parameterType="com.github.zhiduoming.pojo.ReviewReply"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO review_reply (review_id, user_id, content)
+        VALUES (#{reviewId}, #{userId}, #{content})
+    </insert>
+
+    <select id="selectReplyById" resultType="com.github.zhiduoming.pojo.ReviewReply">
+        SELECT id,
+               review_id,
+               user_id,
+               content,
+               create_time,
+               update_time,
+               is_deleted
+        FROM review_reply
+        WHERE id = #{replyId}
+        LIMIT 1
+    </select>
+
+    <update id="logicDeleteReplyByIdAndUserId">
+        UPDATE review_reply
+        SET is_deleted = 1
+        WHERE id = #{replyId}
+          AND user_id = #{userId}
+          AND is_deleted = 0
+    </update>
+
+    <select id="countCampusByUniversityId" resultType="int">
+        SELECT COUNT(*)
+        FROM campus
+        WHERE id = #{campusId}
+          AND university_id = #{universityId}
+          AND is_deleted = 0
+    </select>
+</mapper>

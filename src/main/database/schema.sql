@@ -5,6 +5,8 @@ CREATE DATABASE IF NOT EXISTS uni_tour
 USE uni_tour;
 
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS review_reply;
+DROP TABLE IF EXISTS review_like;
 DROP TABLE IF EXISTS university_review;
 DROP TABLE IF EXISTS poi;
 DROP TABLE IF EXISTS campus;
@@ -93,11 +95,6 @@ CREATE TABLE users
   COLLATE = utf8mb4_unicode_ci
   COMMENT ='用户信息表';
 
-ALTER TABLE users
-    ADD COLUMN profile_completed TINYINT NOT NULL DEFAULT 0 COMMENT '资料是否完善:0否/1是'
-        AFTER current_uni_id;
-
-
 CREATE TABLE poi
 (
     id                 BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT 'POI主键ID',
@@ -128,15 +125,15 @@ CREATE TABLE university_review
     university_id    BIGINT        NOT NULL COMMENT '高校ID',
     campus_id        BIGINT COMMENT '校区ID,评价具体校区时填写',
     content          VARCHAR(1000) NOT NULL COMMENT '评价内容',
-    dormitory_score  TINYINT       NOT NULL COMMENT '宿舍条件评分:1-5',
-    canteen_score    TINYINT       NOT NULL COMMENT '食堂质量评分:1-5',
-    location_score   TINYINT       NOT NULL COMMENT '地理位置评分:1-5',
-    study_score      TINYINT       NOT NULL COMMENT '学习氛围评分:1-5',
-    culture_score    TINYINT       NOT NULL COMMENT '文化氛围评分:1-5',
-    club_score       TINYINT       NOT NULL COMMENT '社团活动评分:1-5',
-    employment_score TINYINT       NOT NULL COMMENT '就业前景评分:1-5',
-    campus_score     TINYINT       NOT NULL COMMENT '校园环境评分:1-5',
-    overall_score    DECIMAL(3, 2) NOT NULL COMMENT '综合评分',
+    dormitory_score  TINYINT COMMENT '宿舍条件评分:1-5,纯文字评价为空',
+    canteen_score    TINYINT COMMENT '食堂质量评分:1-5,纯文字评价为空',
+    location_score   TINYINT COMMENT '地理位置评分:1-5,纯文字评价为空',
+    study_score      TINYINT COMMENT '学习氛围评分:1-5,纯文字评价为空',
+    culture_score    TINYINT COMMENT '文化氛围评分:1-5,纯文字评价为空',
+    club_score       TINYINT COMMENT '社团活动评分:1-5,纯文字评价为空',
+    employment_score TINYINT COMMENT '就业前景评分:1-5,纯文字评价为空',
+    campus_score     TINYINT COMMENT '校园环境评分:1-5,纯文字评价为空',
+    overall_score    DECIMAL(3, 2) COMMENT '综合评分,纯文字评价为空',
     is_anonymous     TINYINT       NOT NULL DEFAULT 0 COMMENT '是否匿名:0否/1是',
     create_time      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -155,8 +152,66 @@ CREATE TABLE university_review
     CONSTRAINT ck_review_culture_score CHECK (culture_score BETWEEN 1 AND 5),
     CONSTRAINT ck_review_club_score CHECK (club_score BETWEEN 1 AND 5),
     CONSTRAINT ck_review_employment_score CHECK (employment_score BETWEEN 1 AND 5),
-    CONSTRAINT ck_review_campus_score CHECK (campus_score BETWEEN 1 AND 5)
+    CONSTRAINT ck_review_campus_score CHECK (campus_score BETWEEN 1 AND 5),
+    CONSTRAINT ck_review_score_all_or_none CHECK (
+        (
+            dormitory_score IS NULL
+                AND canteen_score IS NULL
+                AND location_score IS NULL
+                AND study_score IS NULL
+                AND culture_score IS NULL
+                AND club_score IS NULL
+                AND employment_score IS NULL
+                AND campus_score IS NULL
+                AND overall_score IS NULL
+            )
+            OR
+        (
+            dormitory_score IS NOT NULL
+                AND canteen_score IS NOT NULL
+                AND location_score IS NOT NULL
+                AND study_score IS NOT NULL
+                AND culture_score IS NOT NULL
+                AND club_score IS NOT NULL
+                AND employment_score IS NOT NULL
+                AND campus_score IS NOT NULL
+                AND overall_score IS NOT NULL
+            )
+        )
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci
   COMMENT ='高校多维评价表';
+
+CREATE TABLE review_like
+(
+    id          BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '点赞ID',
+    review_id   BIGINT   NOT NULL COMMENT '评价ID',
+    user_id     BIGINT   NOT NULL COMMENT '点赞用户ID',
+    create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    UNIQUE KEY uk_review_like (review_id, user_id),
+    KEY idx_review_like_user_id (user_id),
+    CONSTRAINT fk_review_like_review FOREIGN KEY (review_id) REFERENCES university_review (id),
+    CONSTRAINT fk_review_like_user FOREIGN KEY (user_id) REFERENCES users (id)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  COMMENT ='评价点赞表';
+
+CREATE TABLE review_reply
+(
+    id          BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '回复ID',
+    review_id   BIGINT       NOT NULL COMMENT '评价ID',
+    user_id     BIGINT       NOT NULL COMMENT '回复用户ID',
+    content     VARCHAR(500) NOT NULL COMMENT '回复内容',
+    create_time DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    is_deleted  TINYINT      NOT NULL DEFAULT 0 COMMENT '逻辑删除',
+    KEY idx_review_reply_review_id (review_id, is_deleted),
+    KEY idx_review_reply_user_id (user_id, is_deleted),
+    CONSTRAINT fk_review_reply_review FOREIGN KEY (review_id) REFERENCES university_review (id),
+    CONSTRAINT fk_review_reply_user FOREIGN KEY (user_id) REFERENCES users (id)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  COMMENT ='评价回复表';

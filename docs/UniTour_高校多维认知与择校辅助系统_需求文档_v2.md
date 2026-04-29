@@ -413,7 +413,7 @@ V1 建议先固定评分维度，不做动态配置。
 接口：
 
 ```http
-POST /api/v1/reviews
+POST /api/v1/universities/{universityId}/reviews
 GET /api/v1/universities/{universityId}/reviews?page=1&size=10
 DELETE /api/v1/reviews/{reviewId}
 ```

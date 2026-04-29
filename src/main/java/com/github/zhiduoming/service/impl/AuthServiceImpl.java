@@ -21,6 +21,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final BCryptPasswordEncoder passwordEncoder;
 
+    //采用构造注入法
     public AuthServiceImpl(UserMapper userMapper, BCryptPasswordEncoder passwordEncoder) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
@@ -86,9 +87,9 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("密码不能为空");
         }
         String username = dto.getUsername().trim();
-        //检验用户名是否存在、用户状态是否合法
         User user = userMapper.selectByUsername(username);
 
+        //检验用户名是否存在、用户状态是否合法
         if (user == null || user.getStatus() == null || user.getStatus() != 1) {
             throw new RuntimeException("用户名或密码错误");
         }

@@ -260,7 +260,7 @@ GET /api/v1/pois/{poiId}
 接口：
 
 ```http
-POST /api/v1/reviews
+POST /api/v1/universities/{universityId}/reviews
 GET /api/v1/universities/{universityId}/reviews?page=1&size=10
 DELETE /api/v1/reviews/{reviewId}
 ```
