@@ -1,5 +1,7 @@
 package com.github.zhiduoming.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.github.zhiduoming.common.PageResult;
 import com.github.zhiduoming.dto.ReviewCreateDTO;
 import com.github.zhiduoming.dto.ReviewPageQuery;
@@ -10,6 +12,7 @@ import com.github.zhiduoming.mapper.UserMapper;
 import com.github.zhiduoming.pojo.UniversityReview;
 import com.github.zhiduoming.pojo.User;
 import com.github.zhiduoming.service.ReviewService;
+import com.github.zhiduoming.vo.ReviewReplyVO;
 import com.github.zhiduoming.vo.ReviewVO;
 import com.github.zhiduoming.vo.UniversityDetailVO;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -152,16 +159,124 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public PageResult<ReviewVO> listReviews(Long universityId, ReviewPageQuery query, Long currentUserId) {
-        return null;
+        // 1. 校验 universityId
+        if (universityId == null) {
+            throw new RuntimeException("高校 ID 不能为空");
+        }
+        // 2. 查询高校是否存在
+        UniversityDetailVO universityDetailVO = universityMapper.selectUniversityById(universityId);
+        if (universityDetailVO == null) {
+            throw new RuntimeException("该高校不存在");
+        }
+        // 3. 处理 page / size
+        int page = (query == null) ? 1 : query.safePage();
+        int size = (query == null) ? 10 : query.safeSize();
+        // 4. PageHelper.startPage(page, size)
+        PageHelper.startPage(page, size);
+
+        // 5. 查询主评价列表
+        List<ReviewVO> reviews = reviewMapper.selectReviewsByUniversityId(universityId, currentUserId);
+
+        // 6. PageInfo 包装
+        PageInfo<ReviewVO> pageInfo = new PageInfo<>(reviews);
+
+        // 7. 取 reviewId 列表
+        List<Long> reviewsIds = new ArrayList<>();
+        for (ReviewVO review : pageInfo.getList()) {
+            reviewsIds.add(review.getId());
+        }
+        // 8. 批量查回复
+        // 9. 按 reviewId 分组
+        Map<Long, List<ReviewReplyVO>> replyMap = new HashMap<>();
+
+        if (!reviewsIds.isEmpty()) {
+            List<ReviewReplyVO> replies = reviewMapper.selectRepliesByReviewIds(reviewsIds);
+            for (ReviewReplyVO reply : replies) {
+                Long reviewId = reply.getReviewId();
+                List<ReviewReplyVO> list = replyMap.computeIfAbsent(reviewId, k -> new ArrayList<>());
+                list.add(reply);
+            }
+        }
+
+        // 10. 塞 replies
+        for (ReviewVO review : pageInfo.getList()) {
+            List<ReviewReplyVO> replies = replyMap.get(review.getId());
+            if (replies == null) {
+                replies = new ArrayList<>();
+            }
+            review.setReplies(replies);
+        }
+
+        // 11. 返回 PageResult
+        return new PageResult<>(
+                pageInfo.getTotal(),
+                pageInfo.getPageNum(),
+                pageInfo.getPageSize(),
+                pageInfo.getList()
+        );
+
     }
 
     @Override
+    @Transactional
     public void deleteReview(Long userId, Long reviewId) {
+        // 1. 校验用户是否登录
+        if (userId == null) {
+            throw new RuntimeException("用户未登录");
+        }
 
+        // 2. 校验用户是否存在且状态正常
+        User user = userMapper.selectById(userId);
+        if (user == null || user.getStatus() == null || user.getStatus() != 1) {
+            throw new RuntimeException("用户不存在或已被禁用");
+        }
+
+        // 3. 校验评价 ID
+        if (reviewId == null) {
+            throw new RuntimeException("评价 ID 不能为空");
+        }
+
+        // 4. 查询评价是否存在
+        UniversityReview review = reviewMapper.selectReviewById(reviewId);
+        if (review == null || review.getIsDeleted() == null || review.getIsDeleted() == 1) {
+            throw new RuntimeException("评价不存在或已删除");
+        }
+
+        // 5. 执行逻辑删除。SQL 中带 user_id 条件，防止删除别人的评价。
+        int rows = reviewMapper.logicDeleteReviewByIdAndUserId(reviewId, userId);
+
+        // 6. rows 为 0 通常表示当前用户不是评价作者，或评价已被并发删除。
+        if (rows != 1) {
+            throw new RuntimeException("无权限删除该评价");
+        }
     }
 
     @Override
     public void likeReview(Long userId, Long reviewId) {
+        //1.校验用户ID
+        if(userId==null){
+            throw new RuntimeException("用户 ID 不能为空");
+        }
+        //2.校验用户状态
+        User user =userMapper.selectById(userId);
+        if(user==null||user.getStatus()==null||user.getStatus()!=1){
+            throw new RuntimeException("用户不存在或被禁用");
+        }
+        //3.校验评价是否存在
+        UniversityReview review = reviewMapper.selectReviewById(reviewId);
+        if(review==null){
+            throw new RuntimeException("评价不存在");
+        }
+        //4.校验评价是否被删除
+        if(review.getIsDeleted()==null||review.getIsDeleted()==1){
+            throw new RuntimeException("评价已被删除");
+        }
+        //5.更新点赞的状态
+        int rows = reviewMapper.insertLike(reviewId, userId);
+
+        if(rows==0){
+            throw new RuntimeException("不能重复点赞");
+        }
 
     }
 
