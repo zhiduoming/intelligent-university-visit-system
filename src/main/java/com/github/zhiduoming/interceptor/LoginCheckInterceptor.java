@@ -21,6 +21,9 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             return true;
         }
+        if (isPublicReviewList(request)) {
+            return true;
+        }
 
         String authorization = request.getHeader("Authorization");
 
@@ -49,5 +52,13 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().write("{\"code\":0,\"msg\":\"NOT_LOGIN\",\"data\":null}");
+    }
+
+    /**
+     * 评价列表属于公开浏览能力；发布评价、点赞、回复仍然需要登录。
+     */
+    private boolean isPublicReviewList(HttpServletRequest request) {
+        return "GET".equalsIgnoreCase(request.getMethod())
+                && request.getRequestURI().matches("^/api/v1/universities/\\d+/reviews$");
     }
 }

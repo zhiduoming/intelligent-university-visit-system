@@ -1,9 +1,21 @@
-<<<<<<< HEAD
 HELP.md
+
+### Maven ###
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+
+### Local env ###
+.env
+.env.*
+!.env.example
+
+### Logs ###
+*.log
+
+### macOS ###
+.DS_Store
 
 ### STS ###
 .apt_generated
@@ -15,7 +27,7 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -32,10 +44,3 @@ build/
 
 ### VS Code ###
 .vscode/
-=======
-﻿.idea/
-*.iml
-target/
-*.log
-.DS_Store
->>>>>>> 3ab9693aacb7bd5479be12789308648d17229106

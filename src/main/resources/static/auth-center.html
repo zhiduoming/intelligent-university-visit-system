@@ -1,60 +1,184 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UniTour · 模块预留页</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-  <style>
-    :root { --bg:#08101d; --text:#ebf3ff; --muted:#9db0d3; --line:#2b4365; --primary:#31cba4; --radius:14px; }
-    * { box-sizing:border-box; }
-    body {
-      margin:0; min-height:100vh; display:grid; place-items:center; color:var(--text);
-      font-family:"Noto Sans SC",sans-serif;
-      background: radial-gradient(circle at 10% 10%, rgba(52,98,160,.32), rgba(52,98,160,0) 44%), linear-gradient(180deg,#070f1a,#08101d);
-    }
-    .card {
-      width:min(860px,92vw); border:1px solid var(--line); border-radius:var(--radius);
-      background:linear-gradient(165deg, rgba(17,32,54,.93), rgba(11,22,38,.98));
-      padding:20px;
-    }
-    h1 { margin:0; font-family:"Plus Jakarta Sans","Noto Sans SC",sans-serif; }
-    p { color:var(--muted); line-height:1.7; }
-    .row { display:flex; gap:10px; flex-wrap:wrap; }
-    .btn {
-      text-decoration:none; border-radius:9px; padding:8px 12px; font-weight:700;
-      border:1px solid #3c587f; color:#deedff; background:#11223a;
-    }
-    .btn.main { border:0; color:#05211a; background:linear-gradient(90deg,var(--primary),#58debd); }
-    .meta { margin-top:10px; color:var(--muted); font-size:.84rem; }
-  </style>
+  <title>认证中心 | UniTour</title>
+  <link rel="stylesheet" href="/css/unitour.css?v=20260503b">
 </head>
 <body>
-<main class="card">
-  <h1 id="title">模块预留页</h1>
-  <p id="desc">该模块入口已预留，后端接口完成后可直接在此页面接入业务功能。</p>
-  <div class="row">
-    <a class="btn main" href="/index.html">返回首页</a>
-    <a class="btn" href="/universities.html">进入高校探索页</a>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/index.html">
+      <span class="brand-mark">U</span>
+      <span>UniTour<small>认证与个人资料</small></span>
+    </a>
+    <nav class="nav">
+      <a href="/index.html">首页</a>
+      <a href="/universities.html">高校库</a>
+      <a href="/campus-pois.html">校区 POI</a>
+      <a href="/open-day.html">项目亮点</a>
+      <a class="active" href="/auth-center.html">登录</a>
+    </nav>
   </div>
-  <div class="meta" id="meta">状态：开发中</div>
-</main>
-<script>
-  const map = {
-    '/campus-pois.html': { title: '校区 POI 导览', desc: '将承载校区维度的 POI 列表、筛选和路线规划视图。', status: '状态：开发中（模块入口已就位）' },
-    '/auth-center.html': { title: '认证中心', desc: '将承载注册、登录、JWT、当前用户信息等认证能力。', status: '状态：开发中（等待后端闭环）' },
-    '/wishes.html': { title: '愿望墙社区', desc: '将承载愿望发布、分页查询和本人删除等 UGC 能力。', status: '状态：开发中（已完成页面预留）' },
-    '/reviews.html': { title: '评价中台', desc: '将承载 target_type/target_id 多态评价模型，支持高校与 POI 评分。', status: '状态：规划中（后续迭代）' },
-    '/open-day.html': { title: '开放日看板', desc: '将承载开放日活动资讯、报名入口和时效性筛选。', status: '状态：规划中（后续迭代）' }
-  };
+</header>
 
-  const cfg = map[location.pathname] || { title: '模块预留页', desc: '该模块入口已预留。', status: '状态：开发中' };
-  document.getElementById('title').textContent = cfg.title;
-  document.getElementById('desc').textContent = cfg.desc;
-  document.getElementById('meta').textContent = cfg.status;
+<main>
+  <section class="page-hero">
+    <div class="shell">
+      <span class="eyebrow" style="color:var(--teal-2);border-color:var(--line);background:#fffdf8">Auth Center</span>
+      <h1>认证不是孤立模块，它决定谁能发布评价、更新资料和沉淀个人择校轨迹。</h1>
+      <p>这里把注册、登录、JWT、本人与资料完善放在一个页面里，方便你演示后端权限闭环。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell auth-grid">
+      <section class="form-panel">
+        <h3>登录</h3>
+        <div class="form-stack">
+          <div class="field"><label>用户名</label><input id="loginUsername" placeholder="username"></div>
+          <div class="field"><label>密码</label><input id="loginPassword" type="password" placeholder="password"></div>
+          <button class="btn primary" id="loginBtn" type="button">登录并保存 Token</button>
+          <div class="token-box" id="loginMsg"></div>
+        </div>
+      </section>
+
+      <section class="form-panel">
+        <h3>注册</h3>
+        <div class="form-stack">
+          <div class="field"><label>用户名</label><input id="registerUsername" placeholder="new_user"></div>
+          <div class="field"><label>昵称</label><input id="registerNickname" placeholder="准备择校的同学"></div>
+          <div class="field"><label>密码</label><input id="registerPassword" type="password" placeholder="password"></div>
+          <button class="btn line" id="registerBtn" type="button">创建账号</button>
+          <div class="token-box" id="registerMsg"></div>
+        </div>
+      </section>
+
+      <section class="form-panel">
+        <h3>当前登录状态</h3>
+        <p>Token 会保存在浏览器 localStorage 中，评价页会自动携带。</p>
+        <div class="token-box" id="tokenBox"></div>
+        <div class="actions" style="margin-top:12px">
+          <button class="btn primary" id="meBtn" type="button">查看当前用户</button>
+          <button class="btn line" id="logoutBtn" type="button">退出登录</button>
+        </div>
+        <pre class="token-box" id="meBox" style="white-space:pre-wrap"></pre>
+      </section>
+
+      <section class="form-panel">
+        <h3>完善资料</h3>
+        <p>主评价需要资料完善，这是为了让评分数据更可信。</p>
+        <div class="form-stack">
+          <div class="field"><label>昵称</label><input id="profileNickname" placeholder="昵称"></div>
+          <div class="field">
+            <label>身份</label>
+            <select id="identityType">
+              <option value="1">高中生 / 准大学生</option>
+              <option value="2">在校大学生</option>
+              <option value="3">毕业生</option>
+            </select>
+          </div>
+          <div class="field"><label>高中</label><input id="highSchool" placeholder="可选"></div>
+          <div class="field"><label>目标高校 ID</label><input id="targetUniId" placeholder="例如 1"></div>
+          <div class="field"><label>当前高校 ID</label><input id="currentUniId" placeholder="例如 1"></div>
+          <button class="btn primary" id="profileBtn" type="button">保存资料</button>
+          <div class="token-box" id="profileMsg"></div>
+        </div>
+      </section>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="shell footer-inner">
+    <span>UniTour · 认证中心</span>
+    <span>JWT stored in localStorage</span>
+  </div>
+</footer>
+
+<script src="/js/unitour-api.js"></script>
+<script>
+  const $ = (id) => document.querySelector(id);
+
+  function refreshTokenBox() {
+    const token = UniTour.token();
+    $("#tokenBox").textContent = token ? `当前 Token：${token}` : "当前未登录。";
+  }
+
+  function nullableNumber(id) {
+    const value = $(id).value.trim();
+    return value ? Number(value) : null;
+  }
+
+  $("#loginBtn").addEventListener("click", async () => {
+    $("#loginMsg").textContent = "正在登录...";
+    try {
+      const data = await UniTour.login({
+        username: $("#loginUsername").value.trim(),
+        password: $("#loginPassword").value
+      });
+      UniTour.setToken(data.token);
+      $("#loginMsg").textContent = `登录成功：${data.nickname || data.username}`;
+      refreshTokenBox();
+    } catch (error) {
+      $("#loginMsg").textContent = `登录失败：${error.message}`;
+    }
+  });
+
+  $("#registerBtn").addEventListener("click", async () => {
+    $("#registerMsg").textContent = "正在注册...";
+    try {
+      await UniTour.register({
+        username: $("#registerUsername").value.trim(),
+        nickname: $("#registerNickname").value.trim(),
+        password: $("#registerPassword").value
+      });
+      $("#registerMsg").textContent = "注册成功，现在可以登录。";
+    } catch (error) {
+      $("#registerMsg").textContent = `注册失败：${error.message}`;
+    }
+  });
+
+  $("#meBtn").addEventListener("click", async () => {
+    $("#meBox").textContent = "正在读取...";
+    try {
+      const data = await UniTour.me();
+      $("#meBox").textContent = JSON.stringify(data, null, 2);
+      $("#profileNickname").value = data.nickname || "";
+      $("#identityType").value = data.identityType || 1;
+      $("#highSchool").value = data.highSchool || "";
+      $("#targetUniId").value = data.targetUniId || "";
+      $("#currentUniId").value = data.currentUniId || "";
+    } catch (error) {
+      $("#meBox").textContent = `读取失败：${error.message}`;
+    }
+  });
+
+  $("#logoutBtn").addEventListener("click", () => {
+    UniTour.setToken("");
+    refreshTokenBox();
+    $("#meBox").textContent = "";
+  });
+
+  $("#profileBtn").addEventListener("click", async () => {
+    $("#profileMsg").textContent = "正在保存...";
+    try {
+      const data = await UniTour.updateProfile({
+        nickname: $("#profileNickname").value.trim(),
+        identityType: Number($("#identityType").value),
+        highSchool: $("#highSchool").value.trim(),
+        targetUniId: nullableNumber("#targetUniId"),
+        currentUniId: nullableNumber("#currentUniId")
+      });
+      $("#profileMsg").textContent = `保存成功，资料完善状态：${data.profileCompleted}`;
+      $("#meBox").textContent = JSON.stringify(data, null, 2);
+    } catch (error) {
+      $("#profileMsg").textContent = `保存失败：${error.message}`;
+    }
+  });
+
+  refreshTokenBox();
 </script>
 </body>
 </html>
-

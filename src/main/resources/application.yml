@@ -1,16 +1,18 @@
 
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: Intelligent-University-Visit-System
   datasource:
-    url: jdbc:mysql://localhost:3306/uni_tour
+    url: ${UNITOUR_MYSQL_URL:jdbc:mysql://localhost:3307/uni_tour}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: 2006051Chenyibo?
+    username: ${UNITOUR_MYSQL_USERNAME:root}
+    password: ${UNITOUR_MYSQL_ROOT_PASSWORD}
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${UNITOUR_REDIS_HOST:localhost}
+      port: ${UNITOUR_REDIS_PORT:6379}
 
 #配置日志输出
 mybatis:

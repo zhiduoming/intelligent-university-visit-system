@@ -1,60 +1,163 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UniTour · 模块预留页</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-  <style>
-    :root { --bg:#08101d; --text:#ebf3ff; --muted:#9db0d3; --line:#2b4365; --primary:#31cba4; --radius:14px; }
-    * { box-sizing:border-box; }
-    body {
-      margin:0; min-height:100vh; display:grid; place-items:center; color:var(--text);
-      font-family:"Noto Sans SC",sans-serif;
-      background: radial-gradient(circle at 10% 10%, rgba(52,98,160,.32), rgba(52,98,160,0) 44%), linear-gradient(180deg,#070f1a,#08101d);
-    }
-    .card {
-      width:min(860px,92vw); border:1px solid var(--line); border-radius:var(--radius);
-      background:linear-gradient(165deg, rgba(17,32,54,.93), rgba(11,22,38,.98));
-      padding:20px;
-    }
-    h1 { margin:0; font-family:"Plus Jakarta Sans","Noto Sans SC",sans-serif; }
-    p { color:var(--muted); line-height:1.7; }
-    .row { display:flex; gap:10px; flex-wrap:wrap; }
-    .btn {
-      text-decoration:none; border-radius:9px; padding:8px 12px; font-weight:700;
-      border:1px solid #3c587f; color:#deedff; background:#11223a;
-    }
-    .btn.main { border:0; color:#05211a; background:linear-gradient(90deg,var(--primary),#58debd); }
-    .meta { margin-top:10px; color:var(--muted); font-size:.84rem; }
-  </style>
+  <title>校区 POI | UniTour</title>
+  <link rel="stylesheet" href="/css/unitour.css?v=20260503b">
 </head>
 <body>
-<main class="card">
-  <h1 id="title">模块预留页</h1>
-  <p id="desc">该模块入口已预留，后端接口完成后可直接在此页面接入业务功能。</p>
-  <div class="row">
-    <a class="btn main" href="/index.html">返回首页</a>
-    <a class="btn" href="/universities.html">进入高校探索页</a>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/index.html">
+      <span class="brand-mark">U</span>
+      <span>UniTour<small>校区 POI 导览</small></span>
+    </a>
+    <nav class="nav">
+      <a href="/index.html">首页</a>
+      <a href="/universities.html">高校库</a>
+      <a class="active" href="/campus-pois.html">校区 POI</a>
+      <a href="/open-day.html">项目亮点</a>
+      <a href="/auth-center.html">登录</a>
+    </nav>
   </div>
-  <div class="meta" id="meta">状态：开发中</div>
-</main>
-<script>
-  const map = {
-    '/campus-pois.html': { title: '校区 POI 导览', desc: '将承载校区维度的 POI 列表、筛选和路线规划视图。', status: '状态：开发中（模块入口已就位）' },
-    '/auth-center.html': { title: '认证中心', desc: '将承载注册、登录、JWT、当前用户信息等认证能力。', status: '状态：开发中（等待后端闭环）' },
-    '/wishes.html': { title: '愿望墙社区', desc: '将承载愿望发布、分页查询和本人删除等 UGC 能力。', status: '状态：开发中（已完成页面预留）' },
-    '/reviews.html': { title: '评价中台', desc: '将承载 target_type/target_id 多态评价模型，支持高校与 POI 评分。', status: '状态：规划中（后续迭代）' },
-    '/open-day.html': { title: '开放日看板', desc: '将承载开放日活动资讯、报名入口和时效性筛选。', status: '状态：规划中（后续迭代）' }
-  };
+</header>
 
-  const cfg = map[location.pathname] || { title: '模块预留页', desc: '该模块入口已预留。', status: '状态：开发中' };
-  document.getElementById('title').textContent = cfg.title;
-  document.getElementById('desc').textContent = cfg.desc;
-  document.getElementById('meta').textContent = cfg.status;
+<main>
+  <section class="page-hero">
+    <div class="shell">
+      <span class="eyebrow" style="color:var(--teal-2);border-color:var(--line);background:#fffdf8">Campus POI</span>
+      <h1>把高校拆成具体校区，再拆成真实可感知的校园点位。</h1>
+      <p>这里强调 UniTour 的核心差异：同一所大学的校区体验可能完全不同，POI 是理解校园生活的最小单元。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell split">
+      <div>
+        <div class="toolbar" style="grid-template-columns:1fr auto auto auto">
+          <div class="field">
+            <label for="universitySelect">选择高校</label>
+            <select id="universitySelect"></select>
+          </div>
+          <button class="btn primary" id="loadUniversityBtn" type="button">加载校区</button>
+          <a class="btn line" href="/universities.html">返回高校库</a>
+          <a class="btn line" id="reviewLink" href="/university-detail.html?id=1#reviews">看评价</a>
+        </div>
+
+        <div class="notice" id="campusSummary">正在加载高校列表...</div>
+        <div class="campus-list" id="campusList" style="margin-top:14px"></div>
+      </div>
+
+      <aside class="side-panel">
+        <h3>POI 地图视图</h3>
+        <p>当前是轻量静态地图，用点位卡片表达校园结构。后续可以接入真实地图 SDK。</p>
+        <div class="mini-map">
+          <span class="a">图书馆</span>
+          <span class="b">教学楼</span>
+          <span class="c">食堂</span>
+          <span class="d">体育场</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="shell footer-inner">
+    <span>UniTour · 校区 POI</span>
+    <span>Campus-level campus life view</span>
+  </div>
+</footer>
+
+<script src="/js/unitour-api.js"></script>
+<script>
+  const select = document.querySelector("#universitySelect");
+  const list = document.querySelector("#campusList");
+  const summary = document.querySelector("#campusSummary");
+  const reviewLink = document.querySelector("#reviewLink");
+
+  function poiHtml(poi) {
+    return `
+      <article class="poi-card">
+        <div class="poi-icon">${UniTour.categoryIcon(poi.category)}</div>
+        <div>
+          <h3>${UniTour.escapeHtml(poi.name)}</h3>
+          <p>${UniTour.escapeHtml(poi.intro || "暂无介绍")}</p>
+          <div class="tags">
+            <span class="tag">${UniTour.categoryName(poi.category)}</span>
+            <span class="tag">建议 ${poi.suggestedDuration || "-"} 分钟</span>
+            <span class="tag">热度 ${poi.hotScore || 0}</span>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  async function campusHtml(campus) {
+    let pois = [];
+    let error = "";
+    try {
+      pois = await UniTour.campusPois(campus.id);
+    } catch (err) {
+      error = err.message;
+    }
+
+    return `
+      <article class="campus-card">
+        <h3>${UniTour.escapeHtml(campus.name)}</h3>
+        <p>${UniTour.escapeHtml(campus.address || "地址暂未维护")}</p>
+        <div class="tags">
+          <span class="tag">校区 ID ${campus.id}</span>
+          <span class="tag">热度 ${campus.hotScore || 0}</span>
+          <span class="tag">POI ${pois.length}</span>
+        </div>
+        <div class="poi-list" style="margin-top:12px">
+          ${error ? `<div class="error">POI 加载失败：${UniTour.escapeHtml(error)}</div>` : ""}
+          ${pois.length ? pois.map(poiHtml).join("") : `<div class="empty">当前校区暂未维护 POI。</div>`}
+        </div>
+      </article>
+    `;
+  }
+
+  async function loadUniversities() {
+    try {
+      const page = await UniTour.listUniversities({ page: 1, size: 50 });
+      const items = page.list || [];
+      select.innerHTML = items.map((item) => `<option value="${item.id}">${UniTour.escapeHtml(item.name)}</option>`).join("");
+      const queryUni = UniTour.qs("universityId");
+      if (queryUni) select.value = queryUni;
+      await loadCampuses();
+    } catch (error) {
+      summary.innerHTML = `<span style="color:var(--red)">高校列表加载失败：${UniTour.escapeHtml(error.message)}</span>`;
+    }
+  }
+
+  async function loadCampuses() {
+    const id = select.value;
+    reviewLink.href = `/university-detail.html?id=${id}#reviews`;
+    summary.textContent = "正在加载校区和 POI...";
+    list.innerHTML = "";
+    try {
+      const detail = await UniTour.universityDetail(id);
+      const campuses = detail.campusList || [];
+      summary.textContent = `${detail.name} 共维护 ${campuses.length} 个校区。`;
+      const queryCampus = UniTour.qs("campusId");
+      const ordered = queryCampus
+        ? [...campuses].sort((a, b) => (String(a.id) === String(queryCampus) ? -1 : String(b.id) === String(queryCampus) ? 1 : 0))
+        : campuses;
+      const blocks = [];
+      for (const campus of ordered) {
+        blocks.push(await campusHtml(campus));
+      }
+      list.innerHTML = blocks.join("") || `<div class="empty">暂无校区数据。</div>`;
+    } catch (error) {
+      summary.innerHTML = `<span style="color:var(--red)">加载失败：${UniTour.escapeHtml(error.message)}</span>`;
+    }
+  }
+
+  document.querySelector("#loadUniversityBtn").addEventListener("click", loadCampuses);
+  loadUniversities();
 </script>
 </body>
 </html>
-

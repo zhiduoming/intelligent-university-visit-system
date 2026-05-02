@@ -33,6 +33,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "/",
                         "/index.html",
                         "/universities.html",
+                        "/university-detail.html",
                         "/campus-pois.html",
                         "/auth-center.html",
                         "/reviews.html",

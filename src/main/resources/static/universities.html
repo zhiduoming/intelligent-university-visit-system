@@ -1,725 +1,167 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UniTour · 高校图鉴</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg:#eef2f7; --panel:#ffffff; --line:#dbe3ef; --text:#10233f; --muted:#6c7f9d;
-      --primary:#336cf0; --primary2:#4a4ddd; --accent:#ff7f3e; --ok:#31b985; --danger:#ef5a5a;
-      --radius:16px; --shadow:0 12px 28px rgba(16,35,63,.08);
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:"Noto Sans SC",sans-serif}
-
-    .page{width:min(1340px,96vw);margin:8px auto;border:1px solid #cfd8e6;border-radius:20px;overflow:hidden;background:#e9edf3}
-
-    .topbar{height:78px;background:#fff;border-bottom:1px solid var(--line);display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:12px 18px}
-    .brand{display:flex;align-items:center;gap:11px}
-    .logo{width:44px;height:44px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(145deg,#2f74ff,#2a58d7);color:#fff;font-weight:900;box-shadow:0 8px 18px rgba(51,108,240,.3)}
-    .brand-name{font-family:"Plus Jakarta Sans",sans-serif;font-size:2rem;line-height:1;font-weight:800;display:flex;align-items:center;gap:10px;white-space:nowrap}
-    .mvp{font-size:.76rem;border-radius:8px;padding:3px 8px;font-weight:800;color:#2c66e2;background:#eaf1ff;border:1px solid #d8e6ff}
-
-    .search{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#f1f4f8;border:1px solid #dce5f2;border-radius:999px;padding:5px 7px 5px 14px;min-height:48px}
-    .search input{border:0;background:transparent;color:var(--text);font-size:1rem;font-family:inherit;width:100%}
-    .search input:focus{outline:none}
-    .search button{width:38px;height:38px;border:0;border-radius:50%;background:linear-gradient(145deg,#2f74ff,#2a58d7);color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 16px rgba(51,108,240,.28)}
-
-    .actions{display:flex;align-items:center;gap:10px}
-    .icon-btn{width:38px;height:38px;border:1px solid #d9e2ef;border-radius:11px;background:#fff;color:#4c658b;display:grid;place-items:center;cursor:pointer}
-    .login{border:0;border-radius:999px;padding:10px 18px;background:#0f1d33;color:#fff;font-size:1rem;font-weight:800;cursor:pointer;box-shadow:0 10px 20px rgba(15,29,51,.2)}
-
-    .layout{display:grid;grid-template-columns:196px 1fr;min-height:calc(100vh - 96px)}
-
-    .sidebar{padding:16px 12px;border-right:1px solid var(--line);background:#eef2f7}
-    .group{margin-bottom:16px}
-    .gtitle{color:#8798b2;font-size:.95rem;font-weight:700;padding:6px 10px}
-    .slink{display:flex;align-items:center;gap:10px;text-decoration:none;color:#2f4868;border-radius:10px;padding:10px 12px;margin-top:6px;font-size:1rem;transition:.15s ease}
-    .slink:hover{background:#e7edf8}
-    .slink.active{background:#e6eefc;color:#2f63da;border:1px solid #d2e3ff}
-    .slink.disabled{opacity:.72;cursor:not-allowed;justify-content:space-between;color:#98aac2}
-    .badge-dev{font-size:.74rem;border-radius:8px;padding:2px 6px;font-weight:700;background:#f0f4fb;border:1px solid #dbe5f3;color:#9bacc2}
-
-    .config{margin-top:10px;border:1px dashed #c8d7ec;border-radius:10px;padding:8px;display:grid;gap:7px}
-    .config input{width:100%;border:1px solid #d7e1ef;border-radius:8px;padding:7px 9px;background:#fff;color:#355276;font-size:.82rem}
-    .tiny{font-size:.77rem;color:#8fa1b8}
-
-    .main{padding:16px;display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:14px;align-items:start}
-
-    .hero{border-radius:20px;padding:26px;color:#fff;min-height:230px;position:relative;overflow:hidden;background:linear-gradient(135deg,#2f6ff8 0%,#3a53d5 46%,#6048d7 100%);box-shadow:var(--shadow)}
-    .hero::before{content:"";position:absolute;width:220px;height:220px;border-radius:50%;right:-20px;bottom:-40px;background:rgba(255,255,255,.12)}
-    .hero h1{margin:0;font-family:"Plus Jakarta Sans",sans-serif;font-size:clamp(2.3rem,3.4vw,3.2rem);line-height:1.08;position:relative;z-index:1}
-    .hero p{margin:10px 0 0;max-width:610px;line-height:1.62;font-size:1rem;color:rgba(243,247,255,.97);position:relative;z-index:1}
-    .hero-actions{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:1}
-    .hero-btn{border:0;border-radius:999px;padding:10px 18px;font-size:1.02rem;font-weight:800;cursor:pointer}
-    .hero-btn.main{background:#fff;color:#2a59d7}
-    .hero-btn.sub{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.35)}
-    .hero-metrics{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
-    .metric{border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:5px 10px;background:rgba(255,255,255,.12);font-size:.8rem;font-weight:700}
-
-    .side-card{border-radius:18px;border:1px solid var(--line);background:#fff;box-shadow:var(--shadow);padding:14px}
-    .side-card h3{margin:0;font-size:1.12rem;font-weight:800}
-    .hot-list{display:grid;gap:12px;margin-top:12px}
-    .hot-item{display:grid;grid-template-columns:18px 1fr;gap:8px;color:#344f70;font-size:.95rem;line-height:1.32}
-    .hot-item span:first-child{font-weight:800;color:#ff8a3d}
-
-    .tabs{display:flex;gap:22px;margin-top:14px;border-bottom:1px solid #d6e0ee;overflow:auto}
-    .tab{border:0;background:transparent;color:#5f7598;font-size:1.03rem;font-weight:700;cursor:pointer;padding:10px 0 12px;position:relative;white-space:nowrap}
-    .tab.active{color:#2f63da}
-    .tab.active::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:3px;background:#2f63da}
-    .pane{display:none;margin-top:12px}
-    .pane.active{display:block;animation:paneIn .25s ease}
-
-    .filters{display:grid;grid-template-columns:1fr 120px 120px 90px auto auto auto;gap:8px;align-items:end;margin-bottom:10px}
-    .field label{display:block;margin-bottom:4px;color:#8c9db5;font-size:.78rem;font-weight:700}
-    .field input{width:100%;border:1px solid #d7e1ef;border-radius:10px;padding:8px 10px;background:#f8fafe;color:var(--text)}
-    .field input:focus{outline:none;border-color:#8eb1ff;box-shadow:0 0 0 3px rgba(47,99,218,.12)}
-    .btn{border:1px solid #d7e1ef;border-radius:10px;background:#f8fafe;color:#39557a;padding:8px 11px;font-weight:700;cursor:pointer;font-family:inherit}
-    .btn.primary{border:0;color:#fff;background:linear-gradient(145deg,#2f74ff,#2a58d7)}
-    .meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
-    .pill{border:1px solid #d7e1ef;border-radius:999px;padding:4px 9px;color:#6f819d;font-size:.78rem;font-weight:700;background:#f6f8fc}
-    .error{color:var(--danger);font-size:.83rem;min-height:18px;margin-bottom:6px}
-
-    .list{display:grid;gap:12px}
-    .uni-card{border:1px solid #dce5f2;border-radius:16px;background:#fff;padding:14px;display:grid;grid-template-columns:140px 1fr;gap:14px;box-shadow:0 8px 15px rgba(18,35,61,.05);transition:.15s ease;animation:fadeUp .35s ease}
-    .uni-card:hover{transform:translateY(-2px);box-shadow:0 14px 24px rgba(18,35,61,.1)}
-    .uni-logo{border-radius:14px;display:grid;place-items:center;color:#fff;font-size:2.2rem;font-weight:800;background:linear-gradient(145deg,#3d70e6,#3f47b3)}
-    .uni-main{display:grid;gap:7px}
-    .uni-head{display:flex;justify-content:space-between;align-items:start;gap:10px;flex-wrap:wrap}
-    .uni-name{margin:0;font-size:2rem;line-height:1.13;font-family:"Plus Jakarta Sans",sans-serif;font-weight:800}
-    .enter{border:1px solid #ffd5be;background:#fff3ea;color:#ff7f3e;border-radius:9px;padding:7px 11px;font-size:.95rem;font-weight:800;cursor:pointer;text-decoration:none}
-    .tags{display:flex;gap:8px;flex-wrap:wrap}
-    .tag{border-radius:7px;padding:2px 8px;font-size:.74rem;font-weight:800;border:1px solid #e3eaf5;background:#f6f8fc;color:#596f91}
-    .tag.hl{color:#ef5b5b;border-color:#ffd4d4;background:#fff1f1}
-    .desc{color:#4f6486;font-size:.95rem;line-height:1.58}
-    .foot{display:flex;gap:12px;flex-wrap:wrap;color:#7e90ab;font-size:.88rem}
-    .quick-campus{display:flex;gap:8px;flex-wrap:wrap}
-    .chip{border:1px solid #d7e2f1;border-radius:999px;padding:4px 10px;font-size:.78rem;color:#6280a9;background:#f6f9fe}
-
-    .detail{margin-top:12px;border:1px solid #d8e2ef;border-radius:14px;background:#f8fbff;padding:10px;display:none}
-    .detail.show{display:block;animation:paneIn .2s ease}
-    .dhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
-    .dgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:8px}
-    .cell{border:1px solid #dae4f1;border-radius:10px;padding:7px;background:#fff}
-    .cell .k{color:#8a9cb6;font-size:.74rem;font-weight:700}
-    .cell .v{margin-top:3px;color:#2f4669;font-size:.87rem;font-weight:800;word-break:break-all}
-    .campuses{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-    .campus{border:1px solid #dae4f1;border-radius:10px;padding:8px;background:#fff;display:grid;gap:6px}
-    .ctop{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-
-    .compare{position:sticky;bottom:0;margin-top:12px;border:1px solid #d7e1ef;border-radius:12px;background:#fff;padding:10px;box-shadow:0 -4px 14px rgba(18,35,61,.06)}
-    .compare.hidden{display:none}
-    .compare-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-    .compare-items{display:flex;gap:8px;flex-wrap:wrap}
-    .compare-pill{border:1px solid #d7e1ef;border-radius:999px;padding:5px 10px;font-size:.8rem;color:#4b6386;background:#f8fafe}
-    .compare-result{margin-top:7px;color:#5f7394;font-size:.84rem;line-height:1.5}
-
-    .spot,.log{border:1px solid #dbe4f1;border-radius:12px;padding:10px;background:#fff;box-shadow:0 6px 12px rgba(18,35,61,.04)}
-    .spot h4,.log h4{margin:0;font-size:.98rem;color:#2f4a70;font-weight:800}
-    .spot p,.log p{margin:5px 0 0;color:#6d7f99;font-size:.84rem;line-height:1.5}
-
-    .tools{position:fixed;right:16px;bottom:22px;border-radius:999px;background:#101723;border:1px solid #202b3c;box-shadow:0 12px 22px rgba(0,0,0,.26);padding:8px 7px;display:grid;gap:8px;z-index:30}
-    .tool{width:32px;height:32px;border-radius:10px;border:0;background:transparent;color:#d7e6ff;cursor:pointer;display:grid;place-items:center}
-    .tool:hover{background:#1e293b}
-
-    .dev{display:none;margin-top:10px;border:1px solid #dce5f2;border-radius:12px;background:#f8fbff;padding:8px}
-    .dev.show{display:block}
-    .dev textarea{width:100%;min-height:120px;border:1px solid #d7e1ef;border-radius:9px;background:#fff;color:#1f3a61;padding:8px;resize:vertical;font-size:.77rem;line-height:1.48;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
-
-    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes paneIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-
-    @media (max-width:1240px){.main{grid-template-columns:1fr}.right{display:grid;grid-template-columns:1fr 1fr;gap:12px}}
-    @media (max-width:980px){.layout{grid-template-columns:1fr}.sidebar{border-right:0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.filters{grid-template-columns:1fr 1fr 1fr 1fr}.uni-card{grid-template-columns:120px 1fr}.dgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.campuses{grid-template-columns:1fr}}
-    @media (max-width:700px){.page{width:100%;margin:0;border-radius:0}.topbar{grid-template-columns:1fr}.brand{justify-content:space-between}.actions{justify-content:flex-end}.filters{grid-template-columns:1fr 1fr}.uni-card{grid-template-columns:1fr}.uni-logo{min-height:90px}.right{grid-template-columns:1fr}.tools{right:10px}}
-  </style>
+  <title>高校库 | UniTour</title>
+  <link rel="stylesheet" href="/css/unitour.css?v=20260503b">
 </head>
 <body>
-<div class="page">
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo">U</div>
-      <div class="brand-name">UniTour <span class="mvp">MVP</span></div>
-    </div>
-    <label class="search">
-      <input id="searchInput" placeholder="探索目标高校、特色校区或网红点位...">
-      <button id="searchBtnTop" type="button" aria-label="搜索">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"></circle><path d="M20 20L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>
-      </button>
-    </label>
-    <div class="actions">
-      <button class="icon-btn" type="button">🔔</button>
-      <button class="icon-btn" type="button">✉️</button>
-      <button class="login" type="button">登录 / 注册</button>
-    </div>
-  </header>
-
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="group">
-        <div class="gtitle">探索引擎</div>
-        <a class="slink active" href="/universities.html">📊 高校图鉴</a>
-        <a class="slink" href="/wishes.html">✨ 愿望墙</a>
-        <a class="slink disabled" href="javascript:void(0)">📅 开放日 <span class="badge-dev">开发中</span></a>
-      </div>
-      <div class="group">
-        <div class="gtitle">我的足迹</div>
-        <a class="slink" href="javascript:void(0)">♡ 我的收藏</a>
-        <a class="slink" href="javascript:void(0)">↻ 浏览历史</a>
-      </div>
-      <div class="group">
-        <div class="gtitle">导航</div>
-        <a class="slink" href="/index.html">🏠 返回首页</a>
-      </div>
-      <div class="config">
-        <input id="baseUrl" value="http://localhost:8080" title="接口基地址">
-        <input id="apiPrefix" placeholder="/api/v1" title="接口前缀">
-        <button class="btn" id="pingBtn" type="button">接口连通性测试</button>
-        <div class="tiny" id="pingText">连接状态：尚未检测</div>
-      </div>
-    </aside>
-
-    <main class="main">
-      <div>
-        <section class="hero">
-          <h1>打破信息差，重构择校体验。</h1>
-          <p>全景呈现高校真实面貌，从学术氛围到食堂排队指数，你关心的这里都有。当前演示已覆盖高校分页、详情与校区下钻。</p>
-          <div class="hero-actions">
-            <button class="hero-btn main" id="startExploreBtn" type="button">开启探索 →</button>
-            <button class="hero-btn sub" id="toggleDevBtn" type="button">显示开发面板</button>
-          </div>
-          <div class="hero-metrics">
-            <span class="metric" id="metricTotal">高校总数：-</span>
-            <span class="metric" id="metricCurrent">当前页：-</span>
-            <span class="metric" id="metricCount">本页条数：-</span>
-          </div>
-        </section>
-
-        <section>
-          <div class="tabs" role="tablist" aria-label="内容分区">
-            <button class="tab active" data-tab="universities" type="button">推荐高校</button>
-            <button class="tab" data-tab="hotspots" type="button">热门打卡点</button>
-            <button class="tab" data-tab="logs" type="button">最新日志</button>
-          </div>
-
-          <div class="pane active" id="pane-universities">
-            <div class="filters">
-              <div class="field"><label for="keywordInput">关键词（大学名/简称）</label><input id="keywordInput" placeholder="北邮 / 北航"></div>
-              <div class="field"><label for="provinceInput">省份</label><input id="provinceInput" placeholder="北京"></div>
-              <div class="field"><label for="cityInput">城市</label><input id="cityInput" placeholder="北京"></div>
-              <div class="field"><label for="sizeInput">每页数量</label><input id="sizeInput" type="number" min="1" max="50" value="10"></div>
-              <button class="btn primary" id="searchBtn" type="button">查询</button>
-              <button class="btn" id="prevBtn" type="button">上一页</button>
-              <button class="btn" id="nextBtn" type="button">下一页</button>
-            </div>
-
-            <div class="meta">
-              <span class="pill" id="pagePill">页码: 1</span>
-              <span class="pill" id="totalPill">总数: 0</span>
-              <span class="pill" id="countPill">当前: 0</span>
-            </div>
-            <div class="error" id="listError"></div>
-            <div class="list" id="universityList"></div>
-
-            <section class="detail" id="detailPanel">
-              <div class="dhead">
-                <strong id="detailTitle">大学详情</strong>
-                <button class="btn" id="closeDetailBtn" type="button">收起</button>
-              </div>
-              <div class="dgrid" id="detailGrid"></div>
-              <div class="campuses" id="campusList"></div>
-            </section>
-
-            <section class="compare hidden" id="compareBar">
-              <div class="compare-row">
-                <strong>一键对比（亮点）</strong>
-                <div>
-                  <button class="btn" id="clearCompareBtn" type="button">清空</button>
-                  <button class="btn primary" id="buildCompareBtn" type="button">生成对比摘要</button>
-                </div>
-              </div>
-              <div class="compare-items" id="compareItems"></div>
-              <div class="compare-result" id="compareResult">将高校加入对比后，这里会生成可用于面试讲解的摘要。</div>
-            </section>
-
-            <section class="dev" id="devPanel">
-              <label class="tiny" for="requestBox">最近请求</label>
-              <textarea id="requestBox" readonly></textarea>
-              <label class="tiny" for="responseBox">最近响应</label>
-              <textarea id="responseBox" readonly></textarea>
-            </section>
-          </div>
-
-          <div class="pane" id="pane-hotspots">
-            <div id="hotspotList"></div>
-          </div>
-
-          <div class="pane" id="pane-logs">
-            <article class="log"><h4>2026-04-17 · 页面风格升级</h4><p>对齐“产品工作台”视觉语言，强化模块分区与信息密度，首页与功能页职责明确。</p></article>
-            <article class="log"><h4>2026-04-16 · 分页能力落地</h4><p>大学列表支持 keyword/province/city，多条件组合查询可直接服务前端检索。</p></article>
-            <article class="log"><h4>2026-04-15 · 核心链路贯通</h4><p>高校列表、大学详情、校区 POI 主链路已能演示“查询 -> 下钻 -> 讲解”完整流程。</p></article>
-          </div>
-        </section>
-      </div>
-
-      <aside class="right">
-        <section class="side-card">
-          <h3>全站热搜榜</h3>
-          <div class="hot-list" id="hotSearchList">
-            <div class="hot-item"><span>1</span><span>北邮西土城食堂哪个窗口最稳</span></div>
-            <div class="hot-item"><span>2</span><span>北航沙河校区自习室推荐</span></div>
-            <div class="hot-item"><span>3</span><span>2026 计算机科学考研难度观察</span></div>
-            <div class="hot-item"><span>4</span><span>沙河高校园周边地铁规划</span></div>
-          </div>
-        </section>
-
-        <section class="side-card" style="margin-top:12px;">
-          <h3>本周亮点</h3>
-          <div class="hot-list" style="margin-top:10px;">
-            <div class="hot-item"><span>✓</span><span>分页查询 + 多条件过滤落地</span></div>
-            <div class="hot-item"><span>✓</span><span>大学详情联动校区展示</span></div>
-            <div class="hot-item"><span>✓</span><span>新增高校一键对比摘要</span></div>
-          </div>
-          <div class="tiny" style="margin-top:10px;line-height:1.5;">© 2026 UniTour By Chen.<br>Java 后端架构 MVP 演示版本</div>
-        </section>
-      </aside>
-    </main>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/index.html">
+      <span class="brand-mark">U</span>
+      <span>UniTour<small>高校库与校区认知</small></span>
+    </a>
+    <nav class="nav">
+      <a href="/index.html">首页</a>
+      <a class="active" href="/universities.html">高校库</a>
+      <a href="/campus-pois.html">校区 POI</a>
+      <a href="/open-day.html">项目亮点</a>
+      <a href="/auth-center.html">登录</a>
+    </nav>
   </div>
-</div>
+</header>
 
-<div class="tools">
-  <button class="tool" id="goTopBtn" type="button" title="回到顶部">↑</button>
-  <button class="tool" id="quickSearchBtn" type="button" title="聚焦搜索">⌕</button>
-  <button class="tool" id="quickHomeBtn" type="button" title="返回首页">⌂</button>
-</div>
+<main>
+  <section class="page-hero">
+    <div class="shell">
+      <span class="eyebrow" style="color:var(--teal-2);border-color:var(--line);background:#fffdf8">University Atlas</span>
+      <h1>先选学校，再进入完整详情页。</h1>
+      <p>高校库只负责清晰浏览和筛选，不把复杂详情挤在右侧小空间里。点击高校卡片后进入独立详情页，校区、POI、评分和评论都在那里展开。</p>
+    </div>
+  </section>
 
+  <section class="section">
+    <div class="shell">
+      <div class="toolbar">
+        <div class="field">
+          <label for="keyword">关键词</label>
+          <input id="keyword" placeholder="北邮 / 电子 / 深圳">
+        </div>
+        <div class="field">
+          <label for="province">省份</label>
+          <input id="province" placeholder="北京">
+        </div>
+        <div class="field">
+          <label for="city">城市</label>
+          <input id="city" placeholder="北京">
+        </div>
+        <button class="btn primary" id="searchBtn" type="button">查询</button>
+      </div>
+
+      <div class="notice" id="summary">正在加载高校数据...</div>
+      <div class="uni-list catalog" id="list" style="margin-top:14px"></div>
+
+      <div class="actions" style="margin-top:18px">
+        <button class="btn line" id="prevBtn" type="button">上一页</button>
+        <button class="btn line" id="nextBtn" type="button">下一页</button>
+        <span id="pageText" style="color:var(--muted);font-weight:750"></span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="shell footer-inner">
+    <span>UniTour · 高校库</span>
+    <span>Click school cards to enter detail pages</span>
+  </div>
+</footer>
+
+<script src="/js/unitour-api.js"></script>
 <script>
-  const state = {
-    page: 1,
-    size: 10,
-    total: 0,
-    tab: "universities",
-    selectedUniversityId: null,
-    compareMap: new Map(),
-    universities: []
-  };
+  const state = { page: 1, size: 9, total: 0, keyword: "", province: "", city: "" };
+  const $ = (id) => document.querySelector(id);
 
-  const $ = (id) => document.getElementById(id);
-
-  function esc(v) {
-    return String(v ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#39;");
-  }
-
-  function base() {
-    const b = $("baseUrl").value.trim().replace(/\/$/, "");
-    const p = $("apiPrefix").value.trim().replace(/\/$/, "");
-    return `${b}${p}`;
-  }
-
-  function setDev(req, resp) {
-    $("requestBox").value = JSON.stringify(req, null, 2);
-    $("responseBox").value = JSON.stringify(resp, null, 2);
-  }
-
-  function parseResult(payload) {
-    if (payload && typeof payload === "object" && "code" in payload) {
-      if (payload.code !== 1) throw new Error(payload.msg || "业务失败");
-      return payload.data;
-    }
-    return payload;
-  }
-
-  async function getJson(url, req) {
-    const res = await fetch(url, { headers: { Accept: "application/json" } });
-    const text = await res.text();
-    let json;
+  function iconUrl(item) {
     try {
-      json = JSON.parse(text);
+      const url = new URL(item.officialWebsite || item.logoUrl || "");
+      return `${url.origin}/favicon.ico`;
     } catch {
-      throw new Error(`响应不是 JSON（HTTP ${res.status}）`);
-    }
-    setDev(req, json);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return json;
-  }
-
-  function updateMeta(count) {
-    $("pagePill").textContent = `页码: ${state.page}`;
-    $("totalPill").textContent = `总数: ${state.total}`;
-    $("countPill").textContent = `当前: ${count}`;
-    $("metricTotal").textContent = `高校总数：${state.total}`;
-    $("metricCurrent").textContent = `当前页：${state.page}`;
-    $("metricCount").textContent = `本页条数：${count}`;
-  }
-
-  function setError(text = "") {
-    $("listError").textContent = text;
-  }
-
-  function shortName(name, short) {
-    if (short && String(short).trim()) return String(short).trim();
-    const n = String(name || "高校").trim();
-    return n.length <= 2 ? n : n.slice(0, 2);
-  }
-
-  async function ping() {
-    const url = `${base()}/universities?page=1&size=1`;
-    try {
-      await getJson(url, { method: "GET", url });
-      $("pingText").textContent = "连接状态：接口可访问";
-      $("pingText").style.color = "var(--ok)";
-    } catch (e) {
-      $("pingText").textContent = `连接状态：${e.message}`;
-      $("pingText").style.color = "var(--danger)";
+      return "";
     }
   }
 
-  async function loadUniversities(reset = false) {
-    if (reset) state.page = 1;
-    state.size = Number($("sizeInput").value || 10);
-
-    const keyword = $("keywordInput").value.trim();
-    const province = $("provinceInput").value.trim();
-    const city = $("cityInput").value.trim();
-
-    const params = new URLSearchParams();
-    params.set("page", String(state.page));
-    params.set("size", String(state.size));
-    if (keyword) params.set("keyword", keyword);
-    if (province) params.set("province", province);
-    if (city) params.set("city", city);
-
-    const url = `${base()}/universities?${params.toString()}`;
-    setError();
-
-    try {
-      const payload = await getJson(url, { method: "GET", url, params: Object.fromEntries(params) });
-      const data = parseResult(payload);
-      let pageData;
-      if (Array.isArray(data)) {
-        pageData = { total: data.length, page: state.page, list: data };
-      } else {
-        pageData = {
-          total: Number(data?.total || 0),
-          page: Number(data?.page || state.page),
-          list: Array.isArray(data?.list) ? data.list : []
-        };
-      }
-      state.total = pageData.total;
-      state.page = pageData.page;
-      state.universities = pageData.list;
-      renderUniversities(pageData.list);
-      renderHotSearch(pageData.list);
-      renderHotspots(pageData.list);
-      updateMeta(pageData.list.length);
-    } catch (e) {
-      state.universities = [];
-      renderUniversities([]);
-      renderHotSearch([]);
-      updateMeta(0);
-      setError(e.message);
-    }
+  function tagHtml(item) {
+    return UniTour.tags(item.tags).slice(0, 5)
+      .map((tag) => `<span class="tag ${tag.includes("985") || tag.includes("211") || tag.includes("双一流") ? "hot" : ""}">${UniTour.escapeHtml(tag)}</span>`)
+      .join("");
   }
 
-  function renderUniversities(list) {
-    const el = $("universityList");
-    if (!list.length) {
-      el.innerHTML = `<div class="pill">当前条件下没有匹配高校。</div>`;
-      $("detailPanel").classList.remove("show");
-      return;
-    }
-
-    el.innerHTML = list.map((u, idx) => {
-      const tags = [];
-      if (Number(u.is985) === 1) tags.push(`<span class="tag hl">985</span>`);
-      if (Number(u.is211) === 1) tags.push(`<span class="tag">211</span>`);
-      if (Number(u.isDoubleFirstClass) === 1) tags.push(`<span class="tag">双一流</span>`);
-      if (u.schoolType) tags.push(`<span class="tag">${esc(u.schoolType)}</span>`);
-
-      return `
-        <article class="uni-card" style="animation-delay:${idx * 35}ms">
-          <div class="uni-logo">${esc(shortName(u.name, u.shortName))}</div>
-          <div class="uni-main">
-            <div class="uni-head">
-              <h3 class="uni-name">${esc(u.name || "-")}</h3>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="enter" data-act="detail" data-id="${esc(u.id)}" data-name="${esc(u.name || "")}" type="button">查看详情 →</button>
-                <button class="enter" data-act="compare" data-id="${esc(u.id)}" data-name="${esc(u.name || "")}" type="button">加入对比</button>
-              </div>
-            </div>
-            <div class="tags">${tags.join("")}</div>
-            <div class="desc">${esc(u.description || "该高校信息正在完善中，欢迎关注后续扩展模块。")}</div>
-            <div class="foot">
-              <span>📍 ${esc(u.province || "-")} ${esc(u.city || "")}</span>
-              <span>🔗 ${esc(u.officialWebsite || "官网待补充")}</span>
-            </div>
+  function universityCard(item) {
+    const favicon = iconUrl(item);
+    const fallback = UniTour.escapeHtml((item.shortName || item.name || "U").slice(0, 2));
+    return `
+      <article class="uni-card">
+        <div class="uni-card-top">
+          <div class="school-logo">
+            ${favicon ? `<img src="${favicon}" alt="${UniTour.escapeHtml(item.name)}图标" onerror="this.remove();this.parentElement.textContent='${fallback}'">` : fallback}
           </div>
-        </article>
-      `;
-    }).join("");
-  }
-
-  function renderHotSearch(list) {
-    const el = $("hotSearchList");
-    const defaults = [
-      "北邮西土城食堂哪个窗口最稳",
-      "北航沙河校区自习室推荐",
-      "2026 计算机科学考研难度观察",
-      "沙河高校园周边地铁规划"
-    ];
-    const dynamic = list.slice(0, 4).map((u, idx) => `${u.shortName || u.name} 校区攻略与路线建议 #${idx + 1}`);
-    const merged = [...dynamic, ...defaults].slice(0, 4);
-
-    el.innerHTML = merged.map((t, idx) => `
-      <div class="hot-item">
-        <span>${idx + 1}</span>
-        <span>${esc(t)}</span>
-      </div>
-    `).join("");
-  }
-
-  function renderHotspots(list) {
-    const el = $("hotspotList");
-    const names = list.slice(0, 3).map(u => u.name);
-    const use = names.length ? names : ["北京邮电大学", "北京航空航天大学", "中国人民大学"];
-
-    el.innerHTML = use.map((name, idx) => `
-      <article class="spot">
-        <h4>${idx + 1}. ${esc(name)} 热门打卡路线</h4>
-        <p>推荐链路：主校门 → 图书馆 → 特色食堂 → 校园地标。后续将接入真实 POI 热度与时段建议。</p>
+          <div>
+            <h3>${UniTour.escapeHtml(item.name)}</h3>
+            <p>${UniTour.escapeHtml(item.description || "暂无介绍")}</p>
+          </div>
+        </div>
+        <div class="tags">
+          <span class="tag">${UniTour.escapeHtml(item.province || "-")} · ${UniTour.escapeHtml(item.city || "-")}</span>
+          <span class="tag">${UniTour.escapeHtml(item.schoolType || "高校")}</span>
+          <span class="tag">综合评分 ${UniTour.formatScore(item.overallScore)}</span>
+          <span class="tag">评价 ${item.reviewCount || 0}</span>
+          ${tagHtml(item)}
+        </div>
+        <div class="card-actions">
+          <a class="btn primary" href="/university-detail.html?id=${item.id}">进入详情页</a>
+          <a class="btn line" href="/campus-pois.html?universityId=${item.id}">校区 POI</a>
+        </div>
       </article>
-    `).join("");
+    `;
   }
 
-  async function loadDetail(id, fallbackName = "") {
-    if (!id) return;
-    state.selectedUniversityId = Number(id);
-    const url = `${base()}/universities/${state.selectedUniversityId}`;
-
+  async function loadList() {
+    $("#summary").textContent = "正在加载高校数据...";
+    $("#list").innerHTML = "";
     try {
-      const payload = await getJson(url, { method: "GET", url, pathParams: { universityId: state.selectedUniversityId } });
-      const detail = parseResult(payload);
-      renderDetail(detail, fallbackName);
-    } catch (e) {
-      setError(e.message);
+      const data = await UniTour.listUniversities({
+        page: state.page,
+        size: state.size,
+        keyword: state.keyword,
+        province: state.province,
+        city: state.city
+      });
+      state.total = data.total || 0;
+      const list = data.list || [];
+      $("#summary").textContent = `共 ${state.total} 所高校，当前第 ${data.page || state.page} 页。`;
+      $("#list").innerHTML = list.length ? list.map(universityCard).join("") : `<div class="empty">没有匹配的高校。</div>`;
+      $("#pageText").textContent = `第 ${state.page} 页 / 每页 ${state.size} 条`;
+      $("#prevBtn").disabled = state.page <= 1;
+      $("#nextBtn").disabled = state.page * state.size >= state.total;
+    } catch (error) {
+      $("#summary").innerHTML = `<span style="color:var(--red)">加载失败：${UniTour.escapeHtml(error.message)}</span>`;
     }
   }
 
-  function renderDetail(detail, fallbackName = "") {
-    $("detailTitle").textContent = `大学详情 · ${detail?.name || fallbackName || "未命名"}`;
-
-    const rows = [
-      ["学校", detail?.name || "-"],
-      ["简称", detail?.shortName || "-"],
-      ["省市", `${detail?.province || "-"} ${detail?.city || ""}`],
-      ["类型", detail?.schoolType || "-"],
-      ["985", Number(detail?.is985) === 1 ? "是" : "否"],
-      ["211", Number(detail?.is211) === 1 ? "是" : "否"],
-      ["双一流", Number(detail?.isDoubleFirstClass) === 1 ? "是" : "否"],
-      ["官网", detail?.officialWebsite || "-"]
-    ];
-
-    $("detailGrid").innerHTML = rows.map(([k, v]) => `
-      <div class="cell">
-        <div class="k">${esc(k)}</div>
-        <div class="v">${esc(v)}</div>
-      </div>
-    `).join("");
-
-    const campuses = Array.isArray(detail?.campusList) ? detail.campusList : [];
-    if (!campuses.length) {
-      $("campusList").innerHTML = `<div class="pill">该大学暂无校区数据。</div>`;
-    } else {
-      $("campusList").innerHTML = campuses.map(c => `
-        <article class="campus">
-          <div class="ctop">
-            <strong>${esc(c.name || "-")}</strong>
-            <span class="pill">热度 ${esc(c.hotScore || "-")}</span>
-          </div>
-          <div class="tiny">${esc(c.address || "地址待补充")}</div>
-          <div class="quick-campus">
-            <a class="btn" href="/campus-pois.html?campusId=${encodeURIComponent(c.id)}">查看 POI</a>
-            <a class="btn" href="/campus-pois.html?campusId=${encodeURIComponent(c.id)}&sort=hotScoreDesc">热门路线</a>
-          </div>
-        </article>
-      `).join("");
-    }
-
-    $("detailPanel").classList.add("show");
-    $("detailPanel").scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }
-
-  function addCompare(id, name) {
-    if (!id) return;
-    if (state.compareMap.has(id)) return;
-    if (state.compareMap.size >= 3) {
-      setError("最多同时对比 3 所高校，请先清空或移除。")
-      return;
-    }
-
-    const target = state.universities.find(u => Number(u.id) === Number(id));
-    const model = target ? {
-      id: target.id,
-      name: target.name,
-      is985: Number(target.is985) === 1,
-      is211: Number(target.is211) === 1,
-      schoolType: target.schoolType || "-",
-      city: `${target.province || "-"} ${target.city || ""}`.trim()
-    } : { id, name: name || `高校${id}`, is985: false, is211: false, schoolType: "-", city: "-" };
-
-    state.compareMap.set(String(id), model);
-    renderCompareBar();
-    setError();
-  }
-
-  function removeCompare(id) {
-    state.compareMap.delete(String(id));
-    renderCompareBar();
-  }
-
-  function renderCompareBar() {
-    const bar = $("compareBar");
-    const items = Array.from(state.compareMap.values());
-
-    if (!items.length) {
-      bar.classList.add("hidden");
-      $("compareItems").innerHTML = "";
-      $("compareResult").textContent = "将高校加入对比后，这里会生成可用于面试讲解的摘要。";
-      return;
-    }
-
-    bar.classList.remove("hidden");
-    $("compareItems").innerHTML = items.map(i => `
-      <span class="compare-pill">
-        ${esc(i.name)}
-        <button type="button" data-rm="${esc(i.id)}" style="border:0;background:transparent;color:#7f93b1;cursor:pointer;margin-left:6px;">×</button>
-      </span>
-    `).join("");
-  }
-
-  function buildCompareSummary() {
-    const items = Array.from(state.compareMap.values());
-    if (!items.length) {
-      $("compareResult").textContent = "请先加入至少一所高校。";
-      return;
-    }
-
-    const best985 = items.filter(i => i.is985).map(i => i.name);
-    const best211 = items.filter(i => i.is211).map(i => i.name);
-    const types = items.map(i => `${i.name}(${i.schoolType})`).join("、");
-    const cities = items.map(i => `${i.name}在${i.city}`).join("；");
-
-    let summary = `当前对比高校：${items.map(i => i.name).join('、')}。`;
-    summary += ` 学校类型分布：${types}。`;
-    summary += ` 地域信息：${cities}。`;
-    if (best985.length) summary += ` 其中 985 包含：${best985.join('、')}。`;
-    if (best211.length) summary += ` 211 包含：${best211.join('、')}。`;
-    summary += " 可据此继续下钻校区与 POI，形成择校路线判断。";
-
-    $("compareResult").textContent = summary;
-  }
-
-  function switchTab(tab) {
-    state.tab = tab;
-    document.querySelectorAll('.tab').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
-    document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
-    const target = $(`pane-${tab}`);
-    if (target) target.classList.add('active');
-  }
-
-  function bindEvents() {
-    $("pingBtn").addEventListener("click", ping);
-    $("searchBtn").addEventListener("click", () => loadUniversities(true));
-
-    $("searchBtnTop").addEventListener("click", () => {
-      $("keywordInput").value = $("searchInput").value.trim();
-      loadUniversities(true);
-    });
-
-    $("searchInput").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        $("keywordInput").value = $("searchInput").value.trim();
-        loadUniversities(true);
-      }
-    });
-
-    $("startExploreBtn").addEventListener("click", () => {
-      document.querySelector('.tabs')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    });
-
-    $("prevBtn").addEventListener("click", () => {
-      if (state.page > 1) {
-        state.page -= 1;
-        loadUniversities(false);
-      }
-    });
-
-    $("nextBtn").addEventListener("click", () => {
-      const maxPage = Math.max(1, Math.ceil(state.total / Math.max(1, state.size)));
-      if (state.page < maxPage) {
-        state.page += 1;
-        loadUniversities(false);
-      }
-    });
-
-    document.querySelectorAll('.tab').forEach(btn => {
-      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-    });
-
-    $("universityList").addEventListener("click", (e) => {
-      const detailBtn = e.target.closest('button[data-act="detail"]');
-      if (detailBtn) {
-        loadDetail(detailBtn.dataset.id, detailBtn.dataset.name || "");
-        return;
-      }
-      const compareBtn = e.target.closest('button[data-act="compare"]');
-      if (compareBtn) {
-        addCompare(compareBtn.dataset.id, compareBtn.dataset.name || "");
-      }
-    });
-
-    $("compareItems").addEventListener("click", (e) => {
-      const rm = e.target.closest('button[data-rm]');
-      if (!rm) return;
-      removeCompare(rm.dataset.rm);
-    });
-
-    $("clearCompareBtn").addEventListener("click", () => {
-      state.compareMap.clear();
-      renderCompareBar();
-    });
-
-    $("buildCompareBtn").addEventListener("click", buildCompareSummary);
-
-    $("closeDetailBtn").addEventListener("click", () => $("detailPanel").classList.remove("show"));
-
-    $("toggleDevBtn").addEventListener("click", () => {
-      $("devPanel").classList.toggle("show");
-      $("toggleDevBtn").textContent = $("devPanel").classList.contains("show") ? "隐藏开发面板" : "显示开发面板";
-    });
-
-    $("goTopBtn").addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
-    $("quickSearchBtn").addEventListener("click", () => {
-      $("searchInput").focus();
-      $("searchInput").select();
-    });
-    $("quickHomeBtn").addEventListener("click", () => location.href = "/index.html");
-  }
-
-  window.addEventListener("DOMContentLoaded", async () => {
-    bindEvents();
-    await ping();
-    await loadUniversities(true);
+  $("#searchBtn").addEventListener("click", () => {
+    state.page = 1;
+    state.keyword = $("#keyword").value.trim();
+    state.province = $("#province").value.trim();
+    state.city = $("#city").value.trim();
+    loadList();
   });
+  $("#prevBtn").addEventListener("click", () => {
+    if (state.page > 1) {
+      state.page -= 1;
+      loadList();
+    }
+  });
+  $("#nextBtn").addEventListener("click", () => {
+    if (state.page * state.size < state.total) {
+      state.page += 1;
+      loadList();
+    }
+  });
+
+  loadList();
 </script>
 </body>
 </html>

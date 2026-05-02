@@ -1,60 +1,27 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UniTour · 模块预留页</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
-  <style>
-    :root { --bg:#08101d; --text:#ebf3ff; --muted:#9db0d3; --line:#2b4365; --primary:#31cba4; --radius:14px; }
-    * { box-sizing:border-box; }
-    body {
-      margin:0; min-height:100vh; display:grid; place-items:center; color:var(--text);
-      font-family:"Noto Sans SC",sans-serif;
-      background: radial-gradient(circle at 10% 10%, rgba(52,98,160,.32), rgba(52,98,160,0) 44%), linear-gradient(180deg,#070f1a,#08101d);
-    }
-    .card {
-      width:min(860px,92vw); border:1px solid var(--line); border-radius:var(--radius);
-      background:linear-gradient(165deg, rgba(17,32,54,.93), rgba(11,22,38,.98));
-      padding:20px;
-    }
-    h1 { margin:0; font-family:"Plus Jakarta Sans","Noto Sans SC",sans-serif; }
-    p { color:var(--muted); line-height:1.7; }
-    .row { display:flex; gap:10px; flex-wrap:wrap; }
-    .btn {
-      text-decoration:none; border-radius:9px; padding:8px 12px; font-weight:700;
-      border:1px solid #3c587f; color:#deedff; background:#11223a;
-    }
-    .btn.main { border:0; color:#05211a; background:linear-gradient(90deg,var(--primary),#58debd); }
-    .meta { margin-top:10px; color:var(--muted); font-size:.84rem; }
-  </style>
+  <title>项目亮点 | UniTour</title>
+  <link rel="stylesheet" href="/css/unitour.css?v=20260503b">
 </head>
 <body>
-<main class="card">
-  <h1 id="title">模块预留页</h1>
-  <p id="desc">该模块入口已预留，后端接口完成后可直接在此页面接入业务功能。</p>
-  <div class="row">
-    <a class="btn main" href="/index.html">返回首页</a>
-    <a class="btn" href="/universities.html">进入高校探索页</a>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/index.html"><span class="brand-mark">U</span><span>UniTour<small>项目亮点与路线</small></span></a>
+    <nav class="nav"><a href="/index.html">首页</a><a href="/universities.html">高校库</a><a href="/campus-pois.html">校区 POI</a><a href="/university-detail.html?id=1#reviews">评价区</a><a class="active" href="/open-day.html">项目亮点</a></nav>
   </div>
-  <div class="meta" id="meta">状态：开发中</div>
+</header>
+<main>
+  <section class="page-hero"><div class="shell"><span class="eyebrow" style="color:var(--teal-2);border-color:var(--line);background:#fffdf8">Project Story</span><h1>这个项目的重点不是 CRUD 数量，而是数据模型能不能解释择校问题。</h1><p>UniTour 的核心设计是高校、校区、POI、评价四层模型。高校负责宏观画像，校区负责差异，POI 负责具体体验，评价负责真实反馈。</p></div></section>
+  <section class="section"><div class="shell grid cols-3">
+    <article class="feature-card"><div class="num">01 / Domain</div><div><h3>高校挂载评价</h3><p>主评价属于高校，因为择校决策首先比较的是学校；校区作为可选维度，表达“具体体验发生在哪里”。</p></div></article>
+    <article class="feature-card"><div class="num">02 / Cache</div><div><h3>Redis 详情缓存</h3><p>高校详情包含校区列表和评分汇总，读多写少，适合使用 Redis String JSON 缓存，并在评价变化时失效。</p></div></article>
+    <article class="feature-card"><div class="num">03 / Review</div><div><h3>幂等点赞与逻辑删除</h3><p>点赞使用唯一键避免重复写入；评价和回复使用逻辑删除，保留业务痕迹并降低误删风险。</p></div></article>
+  </div></section>
+  <section class="section alt"><div class="shell"><div class="section-head"><h2>后续可以继续做什么。</h2><p>这部分不是假装已经实现，而是把下一阶段路线讲清楚。</p></div><div class="grid cols-4"><article class="tool-card"><h3>开放日活动</h3><p>接入高校开放日、宣讲会、报名入口和时间筛选。</p></article><article class="tool-card"><h3>收藏与对比</h3><p>把目标高校加入对比池，横向比较评分、校区和评论。</p></article><article class="tool-card"><h3>POI 地图</h3><p>接入地图 SDK，把现在的 POI 卡片升级成校园地图。</p></article><article class="tool-card"><h3>内容审核</h3><p>评价内容可加入敏感词、举报、审核状态和管理员处理流。</p></article></div></div></section>
 </main>
-<script>
-  const map = {
-    '/campus-pois.html': { title: '校区 POI 导览', desc: '将承载校区维度的 POI 列表、筛选和路线规划视图。', status: '状态：开发中（模块入口已就位）' },
-    '/auth-center.html': { title: '认证中心', desc: '将承载注册、登录、JWT、当前用户信息等认证能力。', status: '状态：开发中（等待后端闭环）' },
-    '/wishes.html': { title: '愿望墙社区', desc: '将承载愿望发布、分页查询和本人删除等 UGC 能力。', status: '状态：开发中（已完成页面预留）' },
-    '/reviews.html': { title: '评价中台', desc: '将承载 target_type/target_id 多态评价模型，支持高校与 POI 评分。', status: '状态：规划中（后续迭代）' },
-    '/open-day.html': { title: '开放日看板', desc: '将承载开放日活动资讯、报名入口和时效性筛选。', status: '状态：规划中（后续迭代）' }
-  };
-
-  const cfg = map[location.pathname] || { title: '模块预留页', desc: '该模块入口已预留。', status: '状态：开发中' };
-  document.getElementById('title').textContent = cfg.title;
-  document.getElementById('desc').textContent = cfg.desc;
-  document.getElementById('meta').textContent = cfg.status;
-</script>
+<footer class="footer"><div class="shell footer-inner"><span>UniTour · 项目亮点</span><span>Clear model over feature pile</span></div></footer>
 </body>
 </html>
-
