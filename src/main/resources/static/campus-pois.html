@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>校区 POI | UniTour</title>
-  <link rel="stylesheet" href="/css/unitour.css?v=20260503i">
+  <link rel="stylesheet" href="/css/unitour.css?v=20260504b">
 </head>
 <body>
 <header class="topbar">
@@ -44,9 +44,21 @@
 
       <div class="notice" id="campusSummary">正在加载高校列表...</div>
       <div class="campus-list" id="campusList" style="margin-top:14px"></div>
+      <input id="poiImageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+      <input id="campusMapFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
     </div>
   </section>
 </main>
+
+<div class="modal-mask" id="imagePreviewModal" aria-hidden="true">
+  <section class="modal poi-preview-modal" role="dialog" aria-modal="true" aria-labelledby="imagePreviewTitle">
+    <div class="modal-head">
+      <h2 id="imagePreviewTitle">图片预览</h2>
+      <button class="close-btn" id="closeImagePreview" type="button" aria-label="关闭图片预览弹窗">×</button>
+    </div>
+    <div class="poi-preview-stage" id="imagePreviewStage"></div>
+  </section>
+</div>
 
 <footer class="footer">
   <div class="shell footer-inner">
@@ -55,18 +67,26 @@
   </div>
 </footer>
 
-<script src="/js/unitour-api.js?v=20260503e"></script>
+<script src="/js/unitour-api.js?v=20260504b"></script>
 <script src="/js/unitour-user-menu.js?v=20260503e"></script>
 <script>
   const select = document.querySelector("#universitySelect");
   const list = document.querySelector("#campusList");
   const summary = document.querySelector("#campusSummary");
   const reviewLink = document.querySelector("#reviewLink");
+  const poiImageFile = document.querySelector("#poiImageFile");
+  const campusMapFile = document.querySelector("#campusMapFile");
+  let currentUser = null;
+  let pendingPoiImageId = "";
+  let pendingCampusMapId = "";
 
   function poiHtml(poi) {
+    const image = poi.imageUrl || poi.image_url || "";
     return `
       <article class="poi-card">
-        <div class="poi-icon">${UniTour.categoryIcon(poi.category)}</div>
+        ${image
+          ? `<button class="poi-image" data-preview-image="${UniTour.escapeHtml(image)}" data-preview-title="${UniTour.escapeHtml(poi.name)}" type="button"><img src="${UniTour.escapeHtml(image)}" alt="${UniTour.escapeHtml(poi.name)}"></button>`
+          : `<div class="poi-icon">${UniTour.categoryIcon(poi.category)}</div>`}
         <div>
           <h3>${UniTour.escapeHtml(poi.name)}</h3>
           <p>${UniTour.escapeHtml(poi.intro || "暂无介绍")}</p>
@@ -75,32 +95,67 @@
             <span class="tag">建议 ${poi.suggestedDuration || "-"} 分钟</span>
             <span class="tag">热度 ${poi.hotScore || 0}</span>
           </div>
+          ${isAdmin() ? `<button class="btn line poi-image-upload" data-poi-image="${poi.id}" type="button">${image ? "更换图片" : "上传图片"}</button>` : ""}
         </div>
       </article>
     `;
   }
 
-  async function campusHtml(campus) {
+  function isAdmin() {
+    return Number(currentUser?.role) === 9;
+  }
+
+  async function loadCurrentUser() {
+    if (!UniTour.token()) return;
+    try {
+      currentUser = await UniTour.me();
+    } catch {
+      currentUser = null;
+    }
+  }
+
+  async function campusHtml(campus, expanded = false) {
     let pois = [];
     let error = "";
+    const mapImage = campus.mapImageUrl || campus.map_image_url || "";
     try {
       pois = await UniTour.campusPois(campus.id);
     } catch (err) {
       error = err.message;
     }
+    const panelId = `campus-pois-${campus.id}`;
+    const shouldExpand = expanded || Boolean(error);
+    const toggleLabel = shouldExpand ? "收起 POI" : `展开 POI（${pois.length}）`;
+    const toggleIcon = shouldExpand ? "↑" : "↓";
 
     return `
       <article class="campus-card">
-        <h3>${UniTour.escapeHtml(campus.name)}</h3>
-        <p>${UniTour.escapeHtml(campus.address || "地址暂未维护")}</p>
+        <div class="campus-poi-head">
+          <div>
+            <h3>${UniTour.escapeHtml(campus.name)}</h3>
+            <p>${UniTour.escapeHtml(campus.address || "地址暂未维护")}</p>
+          </div>
+        </div>
         <div class="tags">
           <span class="tag">校区 ID ${campus.id}</span>
           <span class="tag">热度 ${campus.hotScore || 0}</span>
           <span class="tag">POI ${pois.length}</span>
         </div>
-        <div class="poi-list compact" style="margin-top:12px">
-          ${error ? `<div class="error">POI 加载失败：${UniTour.escapeHtml(error)}</div>` : ""}
-          ${pois.length ? pois.map(poiHtml).join("") : `<div class="empty">当前校区暂未维护 POI。</div>`}
+        ${mapImage ? `
+          <button class="campus-map-image" data-preview-image="${UniTour.escapeHtml(mapImage)}" data-preview-title="${UniTour.escapeHtml(campus.name)}平面图" type="button">
+            <img src="${UniTour.escapeHtml(mapImage)}" alt="${UniTour.escapeHtml(campus.name)}平面图">
+          </button>
+        ` : ""}
+        ${isAdmin() ? `<button class="btn line campus-map-upload" data-campus-map="${campus.id}" type="button">${mapImage ? "更换校区平面图" : "上传校区平面图"}</button>` : ""}
+        <button class="poi-toggle" type="button" data-poi-toggle="${panelId}" data-poi-count="${pois.length}" aria-expanded="${shouldExpand}" aria-controls="${panelId}" onclick="toggleCampusPois(this)">
+          <span>${toggleLabel}</span>
+          <b aria-hidden="true">${toggleIcon}</b>
+        </button>
+        <div class="poi-collapse" id="${panelId}" ${shouldExpand ? "" : "hidden"}>
+          <div class="poi-list compact">
+            ${error ? `<div class="error">POI 加载失败：${UniTour.escapeHtml(error)}</div>` : ""}
+            ${pois.length ? pois.map(poiHtml).join("") : `<div class="empty">当前校区暂未维护 POI。</div>`}
+          </div>
         </div>
       </article>
     `;
@@ -134,16 +189,116 @@
         : campuses;
       const blocks = [];
       for (const campus of ordered) {
-        blocks.push(await campusHtml(campus));
+        blocks.push(await campusHtml(campus, String(campus.id) === String(queryCampus)));
       }
       list.innerHTML = blocks.join("") || `<div class="empty">暂无校区数据。</div>`;
+      bindPoiImageUploads();
+      bindCampusMapUploads();
+      bindImagePreview();
     } catch (error) {
       summary.innerHTML = `<span style="color:var(--red)">加载失败：${UniTour.escapeHtml(error.message)}</span>`;
     }
   }
 
+  function openImagePreview(url, title) {
+    document.querySelector("#imagePreviewTitle").textContent = title || "图片预览";
+    document.querySelector("#imagePreviewStage").innerHTML = `<img src="${UniTour.escapeHtml(url)}" alt="${UniTour.escapeHtml(title || "图片预览")}">`;
+    document.querySelector("#imagePreviewModal").classList.add("show");
+    document.querySelector("#imagePreviewModal").setAttribute("aria-hidden", "false");
+  }
+
+  function closeImagePreview() {
+    document.querySelector("#imagePreviewModal").classList.remove("show");
+    document.querySelector("#imagePreviewModal").setAttribute("aria-hidden", "true");
+  }
+
+  function bindImagePreview() {
+    document.querySelectorAll("[data-preview-image]").forEach((button) => {
+      button.addEventListener("click", () => {
+        openImagePreview(button.dataset.previewImage, button.dataset.previewTitle);
+      });
+    });
+  }
+
+  function toggleCampusPois(button) {
+    const panel = document.getElementById(button.dataset.poiToggle);
+    if (!panel) return;
+    const nextOpen = panel.hidden;
+    panel.hidden = !nextOpen;
+    button.setAttribute("aria-expanded", String(nextOpen));
+    const count = button.dataset.poiCount || "0";
+    button.querySelector("span").textContent = nextOpen ? "收起 POI" : `展开 POI（${count}）`;
+    button.querySelector("b").textContent = nextOpen ? "↑" : "↓";
+  }
+
+  window.toggleCampusPois = toggleCampusPois;
+
+  function bindPoiImageUploads() {
+    document.querySelectorAll("[data-poi-image]").forEach((button) => {
+      button.addEventListener("click", () => {
+        pendingPoiImageId = button.dataset.poiImage;
+        poiImageFile.click();
+      });
+    });
+  }
+
+  function bindCampusMapUploads() {
+    document.querySelectorAll("[data-campus-map]").forEach((button) => {
+      button.addEventListener("click", () => {
+        pendingCampusMapId = button.dataset.campusMap;
+        campusMapFile.click();
+      });
+    });
+  }
+
+  poiImageFile.addEventListener("change", async () => {
+    const file = poiImageFile.files?.[0];
+    if (!file || !pendingPoiImageId) return;
+    summary.textContent = "正在上传 POI 图片...";
+    try {
+      await UniTour.uploadPoiImage(pendingPoiImageId, file);
+      summary.textContent = "POI 图片已更新，正在刷新列表...";
+      await loadCampuses();
+    } catch (error) {
+      summary.innerHTML = `<span style="color:var(--red)">POI 图片上传失败：${UniTour.escapeHtml(error.message)}</span>`;
+    } finally {
+      pendingPoiImageId = "";
+      poiImageFile.value = "";
+    }
+  });
+
+  campusMapFile.addEventListener("change", async () => {
+    const file = campusMapFile.files?.[0];
+    if (!file || !pendingCampusMapId) return;
+    summary.textContent = "正在上传校区平面图...";
+    try {
+      await UniTour.uploadCampusMap(pendingCampusMapId, file);
+      summary.textContent = "校区平面图已更新，正在刷新列表...";
+      await loadCampuses();
+    } catch (error) {
+      summary.innerHTML = `<span style="color:var(--red)">校区平面图上传失败：${UniTour.escapeHtml(error.message)}</span>`;
+    } finally {
+      pendingCampusMapId = "";
+      campusMapFile.value = "";
+    }
+  });
+
+  document.querySelector("#closeImagePreview").addEventListener("click", closeImagePreview);
+  document.querySelector("#imagePreviewModal").addEventListener("click", (event) => {
+    if (event.target.id === "imagePreviewModal") {
+      closeImagePreview();
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && document.querySelector("#imagePreviewModal").classList.contains("show")) {
+      closeImagePreview();
+    }
+  });
+
   document.querySelector("#loadUniversityBtn").addEventListener("click", loadCampuses);
-  loadUniversities();
+  loadCurrentUser().finally(() => {
+    loadUniversities();
+  });
 </script>
 </body>
 </html>

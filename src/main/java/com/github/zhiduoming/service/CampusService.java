@@ -1,13 +1,11 @@
 package com.github.zhiduoming.service;
 
-import com.github.zhiduoming.pojo.Campus;
-
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface CampusService {
 
     /**
-     * 查询指定高校下的全部校区信息。
+     * 管理员上传校区平面图，并返回最新图片 URL。
      */
-    List<Campus> findAllCampus(Long id);
+    String uploadCampusMap(Long userId, Long campusId, MultipartFile file);
 }

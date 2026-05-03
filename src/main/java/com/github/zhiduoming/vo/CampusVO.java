@@ -13,5 +13,6 @@ public class CampusVO {
     private Long universityId;
     private String name;
     private String address;
+    private String mapImageUrl;
     private Integer hotScore;
 }

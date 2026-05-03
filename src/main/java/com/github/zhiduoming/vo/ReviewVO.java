@@ -15,6 +15,7 @@ public class ReviewVO {
     private Long id;
     private Long userId;
     private String nickname;
+    private String avatarUrl;
     private Long universityId;
     private Long campusId;
     private String campusName;

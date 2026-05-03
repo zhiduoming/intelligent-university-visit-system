@@ -53,6 +53,7 @@ CREATE TABLE campus
     lat           DECIMAL(10, 6) COMMENT '纬度',
     lng           DECIMAL(10, 6) COMMENT '经度',
     description   VARCHAR(1000) COMMENT '校区描述',
+    map_image_url VARCHAR(255) COMMENT '校区平面图链接',
     main_gate     VARCHAR(100) COMMENT '主校门名称',
     hot_score     INT          NOT NULL DEFAULT 0 COMMENT '热度分',
     data_status   TINYINT      NOT NULL DEFAULT 0 COMMENT '数据状态:0占位/1完善',

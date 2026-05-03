@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>用户中心 | UniTour</title>
-  <link rel="stylesheet" href="/css/unitour.css?v=20260503j">
+  <link rel="stylesheet" href="/css/unitour.css?v=20260504a">
 </head>
 <body>
 <header class="topbar">
@@ -33,10 +33,10 @@
   <section class="section">
     <div class="shell center-shell">
       <aside class="profile-card profile-summary">
-        <div class="profile-avatar" id="profileAvatar">U</div>
+        <div class="profile-avatar" id="profileAvatar" role="button" tabindex="0" aria-label="预览当前头像">U</div>
         <input id="avatarFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
         <button class="btn line avatar-upload-btn" id="avatarUploadBtn" type="button" disabled>更换头像</button>
-        <p class="avatar-upload-hint" id="avatarMsg">支持 JPG、PNG、WEBP、GIF，最大 2MB。</p>
+        <p class="avatar-upload-hint" id="avatarMsg">支持 JPG、PNG、WEBP、GIF，最大 10MB。</p>
         <div>
           <h2 id="profileName" style="margin-bottom:4px">未登录</h2>
           <p id="profileStatus" style="margin:0;color:var(--muted)">请先登录后查看资料。</p>
@@ -100,6 +100,16 @@
   </section>
 </div>
 
+<div class="modal-mask" id="avatarPreviewModal" aria-hidden="true">
+  <section class="modal avatar-preview-modal" role="dialog" aria-modal="true" aria-labelledby="avatarPreviewTitle">
+    <div class="modal-head">
+      <h2 id="avatarPreviewTitle">头像预览</h2>
+      <button class="close-btn" id="closeAvatarPreview" type="button" aria-label="关闭头像预览弹窗">×</button>
+    </div>
+    <div class="avatar-preview-stage" id="avatarPreviewStage"></div>
+  </section>
+</div>
+
 <footer class="footer">
   <div class="shell footer-inner">
     <span>UniTour · 用户中心</span>
@@ -113,6 +123,12 @@
   const $ = (selector) => document.querySelector(selector);
   let currentUser = null;
   let universityOptionsLoaded = false;
+  const redirectTarget = safeRedirectTarget(UniTour.qs("redirect"));
+
+  function safeRedirectTarget(value) {
+    if (!value || !value.startsWith("/") || value.startsWith("//")) return "";
+    return value;
+  }
 
   function identityText(value) {
     return ({ 1: "高中生 / 准大学生", 2: "在校大学生", 3: "毕业生", 4: "其他身份" })[value] || "未填写";
@@ -120,6 +136,11 @@
 
   function infoItem(label, value) {
     return `<div class="info-item"><span>${label}</span><b>${UniTour.escapeHtml(value ?? "未填写")}</b></div>`;
+  }
+
+  function roleText(role) {
+    if (Number(role) === 9) return "管理员";
+    return "";
   }
 
   function fillProfileForm(user) {
@@ -139,9 +160,35 @@
     $("#profileNickname").focus();
   }
 
+  async function openProfileModalForRedirect() {
+    await loadUniversityOptions();
+    openProfileModal();
+    $("#profileMsg").textContent = "完善资料并保存后，会自动返回刚才的评价页面。";
+  }
+
   function closeProfileModal() {
     $("#profileModal").classList.remove("show");
     $("#profileModal").setAttribute("aria-hidden", "true");
+  }
+
+  function avatarFallbackText(user) {
+    const name = user?.nickname || user?.username || "U";
+    return String(name).slice(0, 1).toUpperCase();
+  }
+
+  function openAvatarPreview() {
+    if (!currentUser) return;
+    const fallback = UniTour.escapeHtml(avatarFallbackText(currentUser));
+    $("#avatarPreviewStage").innerHTML = currentUser.avatarUrl
+      ? `<img src="${UniTour.escapeHtml(currentUser.avatarUrl)}" alt="头像预览">`
+      : `<div class="avatar-preview-fallback">${fallback}</div>`;
+    $("#avatarPreviewModal").classList.add("show");
+    $("#avatarPreviewModal").setAttribute("aria-hidden", "false");
+  }
+
+  function closeAvatarPreview() {
+    $("#avatarPreviewModal").classList.remove("show");
+    $("#avatarPreviewModal").setAttribute("aria-hidden", "true");
   }
 
   async function loadUniversityOptions() {
@@ -169,20 +216,24 @@
     $("#editProfileBtn").textContent = user.profileCompleted === 1 ? "编辑资料" : "完善资料";
     $("#profileAvatar").innerHTML = user.avatarUrl
       ? `<img src="${UniTour.escapeHtml(user.avatarUrl)}" alt="">`
-      : UniTour.escapeHtml(name.slice(0, 1).toUpperCase());
-    $("#avatarMsg").textContent = "支持 JPG、PNG、WEBP、GIF，最大 2MB。";
+      : UniTour.escapeHtml(avatarFallbackText(user));
+    $("#avatarMsg").textContent = "支持 JPG、PNG、WEBP、GIF，最大 10MB。";
 
-    $("#profileInfo").innerHTML = [
+    const profileItems = [
       infoItem("用户 ID", user.id),
       infoItem("用户名", user.username),
       infoItem("昵称", user.nickname),
-      infoItem("角色", user.role === 1 ? "普通用户" : user.role),
       infoItem("身份类型", identityText(user.identityType)),
       infoItem("高中", user.highSchool),
       infoItem("目标高校", user.targetUniName || user.targetUniId),
       infoItem("当前高校", user.currentUniName || user.currentUniId),
       infoItem("资料完善", user.profileCompleted === 1 ? "是" : "否")
-    ].join("");
+    ];
+    const roleLabel = roleText(user.role);
+    if (roleLabel) {
+      profileItems.splice(3, 0, infoItem("角色", roleLabel));
+    }
+    $("#profileInfo").innerHTML = profileItems.join("");
 
     fillProfileForm(user);
   }
@@ -206,6 +257,9 @@
     try {
       const data = await UniTour.me();
       renderUser(data);
+      if (redirectTarget && data.profileCompleted !== 1) {
+        await openProfileModalForRedirect();
+      }
     } catch (error) {
       $("#profileInfo").innerHTML = `<div class="error">读取失败：${UniTour.escapeHtml(error.message)}</div>`;
       $("#profileBtn").disabled = true;
@@ -220,6 +274,13 @@
   });
 
   $("#editProfileBtn").addEventListener("click", openProfileModal);
+  $("#profileAvatar").addEventListener("click", openAvatarPreview);
+  $("#profileAvatar").addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openAvatarPreview();
+    }
+  });
   $("#avatarUploadBtn").addEventListener("click", () => {
     if (!UniTour.token()) {
       location.href = "/auth-center.html?redirect=/user-center.html";
@@ -251,9 +312,18 @@
       closeProfileModal();
     }
   });
+  $("#closeAvatarPreview").addEventListener("click", closeAvatarPreview);
+  $("#avatarPreviewModal").addEventListener("click", (event) => {
+    if (event.target.id === "avatarPreviewModal") {
+      closeAvatarPreview();
+    }
+  });
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && $("#profileModal").classList.contains("show")) {
       closeProfileModal();
+    }
+    if (event.key === "Escape" && $("#avatarPreviewModal").classList.contains("show")) {
+      closeAvatarPreview();
     }
   });
 
@@ -269,6 +339,13 @@
       });
       $("#profileMsg").textContent = "保存成功。";
       renderUser(data);
+      if (redirectTarget) {
+        $("#profileMsg").textContent = "保存成功，正在返回评价页面...";
+        setTimeout(() => {
+          location.href = redirectTarget;
+        }, 450);
+        return;
+      }
       closeProfileModal();
     } catch (error) {
       $("#profileMsg").textContent = `保存失败：${error.message}`;

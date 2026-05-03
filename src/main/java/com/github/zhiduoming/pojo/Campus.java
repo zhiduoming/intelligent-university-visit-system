@@ -19,6 +19,7 @@ public class Campus {
     private Double lat;
     private Double lng;
     private String description;
+    private String mapImageUrl;
     private String mainGate;
     private Integer hotScore;
     private Integer dataStatus;

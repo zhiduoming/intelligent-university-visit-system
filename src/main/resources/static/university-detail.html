@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>高校详情 | UniTour</title>
-  <link rel="stylesheet" href="/css/unitour.css?v=20260503j">
+  <link rel="stylesheet" href="/css/unitour.css?v=20260504a">
 </head>
 <body>
 <header class="topbar">
@@ -233,6 +233,7 @@
     detail: null,
     currentUser: null,
     userLoaded: false,
+    draftRestored: false,
     mode: "score",
     scores: Object.fromEntries(scoreDefs.map(([key]) => [key, 4]))
   };
@@ -250,18 +251,18 @@
             <strong>${UniTour.formatScore(value)}</strong>
           </div>
           <div class="rating-meter" aria-hidden="true"><i style="width:${width}%"></i></div>
-          <p>${ratingHint(name, score)}</p>
+          <p>${ratingHint(score)}</p>
         </div>
       `;
     }).join("");
   }
 
-  function ratingHint(name, score) {
+  function ratingHint(score) {
     if (!score) return "等待更多评价补充。";
-    if (score >= 4.6) return `${name}反馈突出。`;
-    if (score >= 4.0) return `${name}整体稳定。`;
-    if (score >= 3.2) return `${name}评价分化。`;
-    return `${name}需要重点关注。`;
+    if (score >= 4.6) return `<b>广受好评</b><span>多数用户给予了较高评分，说明该部分体验较成熟，整体认可度较高。</span>`;
+    if (score >= 4.0) return `<b>表现平稳</b><span>评分较为集中，说明该部分体验稳定，但暂未形成特别突出的记忆点。</span>`;
+    if (score >= 3.2) return `<b>体验分化</b><span>用户评分差异较大，说明该部分可能在不同人群中产生了明显不同的感受。</span>`;
+    return `<b>亟待优化</b><span>整体评分偏低，说明该部分仍存在较明显的改进空间。</span>`;
   }
 
   async function countPois(campusList) {
@@ -299,6 +300,97 @@
       || message.includes("登录")
       || message.includes("401")
       || message.includes("NOT_LOGIN");
+  }
+
+  function isProfileIncompleteError(error) {
+    const message = error?.message || "";
+    return message.includes("资料未完善")
+      || message.includes("完善资料")
+      || message.includes("用户资料")
+      || message.includes("个人资料")
+      || message.includes("profile");
+  }
+
+  function reviewDraftKey() {
+    return `unitour_review_draft_${id}`;
+  }
+
+  function reviewReturnPath() {
+    return `/university-detail.html?id=${encodeURIComponent(id)}#reviews`;
+  }
+
+  function userCenterRedirectUrl() {
+    return `/user-center.html?redirect=${encodeURIComponent(reviewReturnPath())}`;
+  }
+
+  function currentDraftPayload() {
+    return {
+      universityId: id,
+      mode: state.mode,
+      campusId: $("#reviewCampus")?.value || "",
+      content: $("#reviewContent")?.value || "",
+      scores: { ...state.scores },
+      savedAt: Date.now()
+    };
+  }
+
+  function saveReviewDraft() {
+    try {
+      sessionStorage.setItem(reviewDraftKey(), JSON.stringify(currentDraftPayload()));
+    } catch {
+      // sessionStorage 不可用时不阻塞评价提交，只是不提供草稿恢复。
+    }
+  }
+
+  function readReviewDraft() {
+    try {
+      const raw = sessionStorage.getItem(reviewDraftKey());
+      if (!raw) return null;
+      const draft = JSON.parse(raw);
+      return String(draft.universityId) === String(id) ? draft : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function clearReviewDraft() {
+    try {
+      sessionStorage.removeItem(reviewDraftKey());
+    } catch {
+      // 忽略清理失败，避免影响正常发布流程。
+    }
+  }
+
+  function restoreReviewDraftIfNeeded() {
+    if (state.draftRestored) return;
+    const draft = readReviewDraft();
+    if (!draft) return;
+
+    state.draftRestored = true;
+    if (draft.mode) setMode(draft.mode);
+    if (draft.scores && typeof draft.scores === "object") {
+      scoreDefs.forEach(([key]) => {
+        const value = Number(draft.scores[key]);
+        if (value >= 1 && value <= 5) state.scores[key] = value;
+      });
+      renderRatingEditor();
+    }
+    $("#reviewCampus").value = draft.campusId || "";
+    $("#reviewContent").value = draft.content || "";
+    $("#reviewMessage").textContent = "已恢复刚才未提交的评价草稿。";
+    $("#reviewModal").classList.add("show");
+  }
+
+  async function promptCompleteProfile() {
+    const confirmed = await centerDialog({
+      title: "完善资料后即可发布评价",
+      message: "当前评价内容已临时保存。完善个人资料后会返回当前高校详情页，并恢复刚才填写的评价。",
+      confirmText: "现在完善资料",
+      cancelText: "稍后再说"
+    });
+    if (confirmed) {
+      location.href = userCenterRedirectUrl();
+    }
   }
 
   function redirectToLogin(message) {
@@ -350,7 +442,21 @@
   }
 
   function canDeleteUserContent(userId) {
-    return Boolean(state.currentUser?.id && String(state.currentUser.id) === String(userId));
+    return Boolean(isCurrentUserAdmin() || (state.currentUser?.id && String(state.currentUser.id) === String(userId)));
+  }
+
+  function isCurrentUserAdmin() {
+    return Number(state.currentUser?.role) === 9;
+  }
+
+  function avatarHtml({ avatarUrl, nickname, anonymous = false, className = "avatar" }) {
+    const name = anonymous ? "匿名" : (nickname || "用户");
+    const fallback = UniTour.escapeHtml(String(name).slice(0, 1).toUpperCase());
+    const url = avatarUrl || "";
+    if (!anonymous && url) {
+      return `<span class="${className}"><img src="${UniTour.escapeHtml(url)}" alt=""></span>`;
+    }
+    return `<span class="${className}">${fallback}</span>`;
   }
 
   function campusCard(campus) {
@@ -407,10 +513,13 @@
     const hiddenReplies = replies.slice(20);
     const replyHtml = (reply) => `
       <div class="reply-item">
-        <div>
-          <b>${UniTour.escapeHtml(reply.nickname || "用户")}</b>
-          <span>${UniTour.escapeHtml(String(reply.createTime || "").replace("T", " "))}</span>
-          <p>${UniTour.escapeHtml(reply.content)}</p>
+        <div class="reply-main">
+          ${avatarHtml({ avatarUrl: reply.avatarUrl || reply.avatar_url, nickname: reply.nickname, className: "avatar reply-avatar" })}
+          <div>
+            <b>${UniTour.escapeHtml(reply.nickname || "用户")}</b>
+            <span>${UniTour.escapeHtml(String(reply.createTime || "").replace("T", " "))}</span>
+            <p>${UniTour.escapeHtml(reply.content)}</p>
+          </div>
         </div>
         ${canDeleteUserContent(reply.userId) ? `<button class="text-danger" data-delete-reply="${reply.id}" type="button">删除</button>` : ""}
       </div>
@@ -419,7 +528,7 @@
       <article class="comment-card">
         <div class="comment-head">
           <div class="user-line">
-            <span class="avatar">人</span>
+            ${avatarHtml({ avatarUrl: review.avatarUrl || review.avatar_url, nickname: review.nickname, anonymous: Number(review.isAnonymous) === 1 })}
             <div class="review-user-stack">
               <strong>${UniTour.escapeHtml(review.nickname || "匿名用户")}</strong>
               <div>
@@ -497,13 +606,22 @@
     $("#ratingEditor").style.display = mode === "score" ? "block" : "none";
   }
 
+  function heroSummary(detail) {
+    const tags = UniTour.tags(detail.tags).slice(0, 4);
+    const campusCount = (detail.campusList || []).length;
+    const typeText = `${detail.schoolType || "高校"}类${detail.educationLevel || "本科"}院校`;
+    const tagText = tags.length ? `，重点关注${tags.join("、")}等方向` : "";
+    const campusText = campusCount ? `，可结合 ${campusCount} 个校区继续查看校园生活差异。` : "，可继续查看校区、POI 和评价信息。";
+    return `${typeText}${tagText}${campusText}`;
+  }
+
   async function loadDetail() {
     try {
       const detail = await UniTour.universityDetail(id);
       state.detail = detail;
       document.title = `${detail.name} | UniTour`;
       $("#uniName").textContent = detail.name;
-      $("#uniDesc").textContent = detail.description || "";
+      $("#uniDesc").textContent = heroSummary(detail);
       $("#summaryName").textContent = detail.name;
       $("#introText").textContent = detail.description || "暂无学校简介。";
       $("#poiLink").href = `/campus-pois.html?universityId=${detail.id}`;
@@ -542,6 +660,7 @@
         .map((campus) => `<option value="${campus.id}">${UniTour.escapeHtml(campus.name)}</option>`)
         .join("");
       await loadReviews();
+      restoreReviewDraftIfNeeded();
     } catch (error) {
       $("#uniName").textContent = "详情加载失败";
       $("#uniDesc").textContent = error.message;
@@ -722,13 +841,20 @@
   $("#reloadReviewsBtn").addEventListener("click", loadReviews);
   $("#submitReviewBtn").addEventListener("click", async () => {
     $("#reviewMessage").textContent = "正在提交...";
+    saveReviewDraft();
     try {
       await UniTour.createReview(id, reviewBody());
+      clearReviewDraft();
       $("#reviewContent").value = "";
       $("#reviewMessage").textContent = "提交成功。";
       closeModal();
       await loadDetail();
     } catch (error) {
+      if (isProfileIncompleteError(error)) {
+        $("#reviewMessage").textContent = "发布评价前需要先完善资料，当前评价草稿已保存。";
+        await promptCompleteProfile();
+        return;
+      }
       $("#reviewMessage").textContent = `提交失败：${error.message}`;
       if (isLoginError(error)) {
         UniTour.setToken("");

@@ -42,6 +42,11 @@ public interface ReviewMapper {
                                        @Param("userId") Long userId);
 
     /**
+     * 管理员按评价 ID 逻辑删除任意主评价。
+     */
+    int logicDeleteReviewById(@Param("reviewId") Long reviewId);
+
+    /**
      * 新增点赞记录。
      */
     int insertLike(@Param("reviewId") Long reviewId,
@@ -69,6 +74,11 @@ public interface ReviewMapper {
      */
     int logicDeleteReplyByIdAndUserId(@Param("replyId") Long replyId,
                                       @Param("userId") Long userId);
+
+    /**
+     * 管理员按回复 ID 逻辑删除任意回复。
+     */
+    int logicDeleteReplyById(@Param("replyId") Long replyId);
 
     /**
      * 检查某个校区是否属于某个高校。

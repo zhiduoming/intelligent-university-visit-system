@@ -48,6 +48,10 @@
                    WHEN r.is_anonymous = 1 THEN '匿名用户'
                    ELSE COALESCE(u.nickname, u.username)
                    END AS nickname,
+               CASE
+                   WHEN r.is_anonymous = 1 THEN NULL
+                   ELSE u.avatar_url
+                   END AS avatarUrl,
                r.university_id,
                r.campus_id,
                c.name AS campus_name,
@@ -97,6 +101,7 @@
                rr.review_id,
                rr.user_id,
                COALESCE(u.nickname, u.username) AS nickname,
+               u.avatar_url AS avatarUrl,
                rr.content,
                rr.create_time
         FROM review_reply rr
@@ -141,6 +146,13 @@
           AND is_deleted = 0
     </update>
 
+    <update id="logicDeleteReviewById">
+        UPDATE university_review
+        SET is_deleted = 1
+        WHERE id = #{reviewId}
+          AND is_deleted = 0
+    </update>
+
     <insert id="insertLike">
         INSERT IGNORE INTO review_like (review_id, user_id)
         VALUES (#{reviewId}, #{userId})
@@ -176,6 +188,13 @@
         SET is_deleted = 1
         WHERE id = #{replyId}
           AND user_id = #{userId}
+          AND is_deleted = 0
+    </update>
+
+    <update id="logicDeleteReplyById">
+        UPDATE review_reply
+        SET is_deleted = 1
+        WHERE id = #{replyId}
           AND is_deleted = 0
     </update>
 

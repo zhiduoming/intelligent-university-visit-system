@@ -17,6 +17,9 @@
 - 南京大学：官网校区地址页面、章程相关公开材料。
 - 电子科技大学：官网校区地址、本科招生网联系方式页面。
 - 西安电子科技大学：官网“招生就业”“联系我们”页面。
+- 西安交通大学：官网“交大简介”、曲江校区简介、中国西部科技创新港页面、国际教育学院公开材料。
+- 南京航空航天大学：官网首页、三维校园 GIS、本科招生章程。
+- 南京理工大学：本科招生章程、入学须知公开材料、兵器博物馆公开资料。
 - 深圳大学：官网校园地图、图书馆分馆页面。
 - 复旦大学：官网“访问复旦”、江湾校区简介页面。
 - 中国科学技术大学：国际学院校区地址页面。
@@ -31,7 +34,7 @@
 
 ## POI 来源策略
 
-POI 只补充官网页面明确出现的点位，或者项目早期 BUPT POI 增量脚本中已经维护并合并进 `init_info.sql` 的点位。
+POI 只补充官网页面明确出现的点位、官方校园地图可见点位，或者项目早期 BUPT POI 增量脚本中已经维护并合并进 `init_info.sql` 的点位。
 
 没有官方来源支撑的校区，不为了凑数量写“正门”“图书馆”“食堂”等看似合理但未核对的点位。
 
@@ -44,3 +47,11 @@ src/main/resources/static/images/university-logos/{universityId}.jpg
 ```
 
 数据库中的 `university.logo_url` 指向本地静态路径，例如 `/images/university-logos/1.jpg`。
+
+本轮新增的西安交通大学、南京航空航天大学、南京理工大学校徽下载自 urongda 中国大学校徽资源页面，并保存为：
+
+```text
+src/main/resources/static/images/university-logos/21.png
+src/main/resources/static/images/university-logos/22.png
+src/main/resources/static/images/university-logos/23.png
+```

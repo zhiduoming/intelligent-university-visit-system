@@ -15,8 +15,8 @@ spring:
       port: ${UNITOUR_REDIS_PORT:6379}
   servlet:
     multipart:
-      max-file-size: ${UNITOUR_MAX_FILE_SIZE:2MB}
-      max-request-size: ${UNITOUR_MAX_REQUEST_SIZE:2MB}
+      max-file-size: ${UNITOUR_MAX_FILE_SIZE:10MB}
+      max-request-size: ${UNITOUR_MAX_REQUEST_SIZE:10MB}
 
 unitour:
   oss:

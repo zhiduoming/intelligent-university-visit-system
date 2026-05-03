@@ -127,6 +127,18 @@ const UniTour = (() => {
     return request("/users/me/avatar", { method: "POST", body: formData });
   }
 
+  function uploadPoiImage(poiId, file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    return request(`/pois/${poiId}/image`, { method: "POST", body: formData });
+  }
+
+  function uploadCampusMap(campusId, file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    return request(`/campuses/${campusId}/map`, { method: "POST", body: formData });
+  }
+
   function qs(name) {
     return new URLSearchParams(location.search).get(name);
   }
@@ -193,6 +205,8 @@ const UniTour = (() => {
     me,
     updateProfile,
     uploadAvatar,
+    uploadPoiImage,
+    uploadCampusMap,
     token,
     setToken,
     qs,

@@ -96,14 +96,16 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     /**
-     * 当前登录用户逻辑删除自己发布的主评价。
+     * 普通用户只能删除自己的主评价；管理员可以删除任意主评价。
      */
     @Override
     @Transactional
     public void deleteReview(Long userId, Long reviewId) {
-        checkActiveUser(userId);
+        User user = checkActiveUser(userId);
         UniversityReview review = checkReviewExists(reviewId);
-        int rows = reviewMapper.logicDeleteReviewByIdAndUserId(reviewId, userId);
+        int rows = isAdmin(user)
+                ? reviewMapper.logicDeleteReviewById(reviewId)
+                : reviewMapper.logicDeleteReviewByIdAndUserId(reviewId, userId);
         if (rows != 1) {
             throw new RuntimeException("无权限删除该评价");
         }
@@ -158,15 +160,17 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     /**
-     * 当前登录用户逻辑删除自己发布的回复。
+     * 普通用户只能删除自己的回复；管理员可以删除任意回复。
      */
     @Override
     @Transactional
     public void deleteReply(Long userId, Long replyId) {
-        checkActiveUser(userId);
+        User user = checkActiveUser(userId);
         checkReplyExists(replyId);
 
-        int rows = reviewMapper.logicDeleteReplyByIdAndUserId(replyId, userId);
+        int rows = isAdmin(user)
+                ? reviewMapper.logicDeleteReplyById(replyId)
+                : reviewMapper.logicDeleteReplyByIdAndUserId(replyId, userId);
         if (rows != 1) {
             throw new RuntimeException("无权限删除该回复");
         }
@@ -185,6 +189,13 @@ public class ReviewServiceImpl implements ReviewService {
             throw new RuntimeException("用户不存在或已被禁用");
         }
         return user;
+    }
+
+    /**
+     * 当前项目约定 role=9 为管理员。
+     */
+    private boolean isAdmin(User user) {
+        return user.getRole() != null && user.getRole() == 9;
     }
 
     /**
