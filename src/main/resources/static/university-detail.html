@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>高校详情 | UniTour</title>
-  <link rel="stylesheet" href="/css/unitour.css?v=20260503b">
+  <link rel="stylesheet" href="/css/unitour.css?v=20260503i">
 </head>
 <body>
 <header class="topbar">
@@ -16,9 +16,7 @@
     <nav class="nav">
       <a href="/index.html">首页</a>
       <a href="/universities.html">高校库</a>
-      <a href="/campus-pois.html">校区 POI</a>
-      <a href="/open-day.html">项目亮点</a>
-      <a href="/auth-center.html">登录</a>
+      <a href="/campus-pois.html">POI</a>
     </nav>
   </div>
 </header>
@@ -30,8 +28,8 @@
       <h1 id="uniName">正在加载高校详情...</h1>
       <p id="uniDesc">请确认后端服务和数据库正在运行。</p>
       <div class="actions">
-        <a class="btn ghost" href="/universities.html">返回高校库</a>
-        <a class="btn ghost" id="poiLink" href="/campus-pois.html">查看校区 POI</a>
+        <a class="btn line" href="/universities.html">返回高校库</a>
+        <a class="btn line" id="poiLink" href="/campus-pois.html">查看 POI</a>
         <button class="btn primary" id="openReviewBtn" type="button">发表评价</button>
       </div>
     </div>
@@ -39,46 +37,64 @@
 
   <section class="section">
     <div class="shell detail-shell">
-      <div class="grid">
-        <section class="profile-card">
-          <div class="section-head" style="margin-bottom:16px">
-            <h2>高校画像</h2>
-            <p id="uniMeta">地区、类型、标签和官网信息会在这里展示。</p>
+      <section class="detail-summary-card">
+        <div class="detail-logo" id="detailLogo">U</div>
+        <div class="detail-main">
+          <h2 id="summaryName">高校名称</h2>
+          <div class="detail-meta">
+            <span id="uniMeta">地区、类型、标签和官网信息会在这里展示。</span>
+            <div class="tags" id="uniTags"></div>
           </div>
-          <div class="tags" id="uniTags"></div>
-        </section>
-
-        <section class="profile-card">
-          <div class="section-head" style="margin-bottom:16px">
-            <h2>校区信息</h2>
-            <p>校区是理解高校体验的关键，不同校区的地址、生活便利度和 POI 可能差异很大。</p>
-          </div>
-          <div class="campus-list" id="campusList"></div>
-        </section>
-
-        <section class="profile-card" id="reviews">
-          <div class="review-toolbar">
-            <div>
-              <h2 style="margin-bottom:6px">评价列表</h2>
-              <p style="margin:0;color:var(--muted)">评分评价会展示维度星级；仅文字评价只展示评论内容。</p>
-            </div>
-            <div class="actions">
-              <button class="btn line" id="reloadReviewsBtn" type="button">刷新评价</button>
-              <button class="btn primary" id="openReviewBtn2" type="button">写评价</button>
-            </div>
-          </div>
-          <div class="review-list" id="reviewList"></div>
-        </section>
-      </div>
-
-      <aside class="side-panel">
-        <h3>多维评分</h3>
-        <p>该评分来自已发布的带评分评价，纯文字评价不参与均分。</p>
-        <div class="score-grid" id="ratingBox"></div>
-        <div class="notice" style="margin-top:14px">
-          主评价挂在高校下，校区可选；这样既能表达学校整体体验，也能标注具体校区差异。
         </div>
-      </aside>
+        <aside class="score-summary">
+          <div class="score-circle">
+            <div>
+              <strong id="summaryScore">-</strong>
+              <span>综合评分</span>
+            </div>
+          </div>
+          <span id="summaryReviewCount" style="color:var(--muted);font-weight:800">0 条评价</span>
+          <a class="btn line" id="officialLink" href="#" target="_blank" rel="noreferrer">学校官网</a>
+        </aside>
+      </section>
+
+      <section class="profile-card intro-card">
+        <div class="section-head" style="margin-bottom:16px">
+          <h2>学校简介</h2>
+          <p>基础介绍单独展示，避免和评分、评论挤在一起。</p>
+        </div>
+        <p id="introText">正在加载学校简介...</p>
+      </section>
+
+      <section class="profile-card">
+        <div class="section-head" style="margin-bottom:16px">
+          <h2>细分维度评分</h2>
+          <p>该评分来自已发布的带评分评价，纯文字评价不参与均分。</p>
+        </div>
+        <div class="rating-card-grid" id="ratingBox"></div>
+      </section>
+
+      <section class="profile-card">
+        <div class="section-head" style="margin-bottom:16px">
+          <h2>校区信息</h2>
+          <p>校区是理解高校体验的关键，不同校区的地址、生活便利度和 POI 可能差异很大。</p>
+        </div>
+        <div class="campus-list" id="campusList"></div>
+      </section>
+
+      <section class="profile-card" id="reviews">
+        <div class="review-toolbar">
+          <div>
+            <h2 style="margin-bottom:6px">评价列表</h2>
+            <p style="margin:0;color:var(--muted)">评分评价会展示维度星级；仅文字评价只展示评论内容。</p>
+          </div>
+          <div class="actions">
+            <button class="btn line" id="reloadReviewsBtn" type="button">刷新评价</button>
+            <button class="btn primary" id="openReviewBtn2" type="button">写评价</button>
+          </div>
+        </div>
+        <div class="review-list" id="reviewList"></div>
+      </section>
     </div>
   </section>
 </main>
@@ -118,6 +134,17 @@
   </section>
 </div>
 
+<div class="modal-mask" id="confirmModal">
+  <section class="modal confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <h2 id="confirmTitle">确认操作</h2>
+    <p id="confirmMessage">请确认是否继续。</p>
+    <div class="actions" style="justify-content:flex-end;margin-top:18px">
+      <button class="btn line" id="confirmCancelBtn" type="button">取消</button>
+      <button class="btn primary" id="confirmOkBtn" type="button">确定</button>
+    </div>
+  </section>
+</div>
+
 <footer class="footer">
   <div class="shell footer-inner">
     <span>UniTour · 高校详情</span>
@@ -125,7 +152,8 @@
   </div>
 </footer>
 
-<script src="/js/unitour-api.js"></script>
+<script src="/js/unitour-api.js?v=20260503e"></script>
+<script src="/js/unitour-user-menu.js?v=20260503e"></script>
 <script>
   const id = UniTour.qs("id") || "1";
   const scoreDefs = [
@@ -138,21 +166,103 @@
     ["employmentScore", "就业支持"],
     ["campusScore", "校园环境"]
   ];
-  const state = { detail: null, mode: "score", scores: Object.fromEntries(scoreDefs.map(([key]) => [key, 4])) };
+  const state = {
+    detail: null,
+    currentUser: null,
+    userLoaded: false,
+    mode: "score",
+    scores: Object.fromEntries(scoreDefs.map(([key]) => [key, 4]))
+  };
   const $ = (selector) => document.querySelector(selector);
 
   function scoreRows(rating) {
     return scoreDefs.map(([key, name]) => {
       const value = rating?.[key];
-      const score = Number(value || 0);
       return `
-        <div class="score-row">
-          <span>${name.slice(0, 4)}</span>
-          <span class="bar"><i style="width:${Math.min(score * 20, 100)}%"></i></span>
-          <b>${UniTour.formatScore(value)}</b>
+        <div class="rating-card">
+          <span>${name}</span>
+          <strong>${UniTour.formatScore(value)}</strong>
         </div>
       `;
-    }).join("") + `<div class="notice">评价数：${rating?.reviewCount || 0}</div>`;
+    }).join("");
+  }
+
+  function iconUrl(item) {
+    if (item.logoUrl) return item.logoUrl;
+    try {
+      const url = new URL(item.officialWebsite || "");
+      return `${url.origin}/favicon.ico`;
+    } catch {
+      return "";
+    }
+  }
+
+  function goLogin(message) {
+    if (message) $("#reviewMessage").textContent = message;
+    const redirect = encodeURIComponent(`${location.pathname}${location.search}${location.hash || "#reviews"}`);
+    setTimeout(() => {
+      location.href = `/auth-center.html?redirect=${redirect}`;
+    }, 850);
+  }
+
+  function isLoginError(error) {
+    const message = error?.message || "";
+    return message.includes("未登录")
+      || message.includes("登录")
+      || message.includes("401")
+      || message.includes("NOT_LOGIN");
+  }
+
+  function redirectToLogin(message) {
+    alert(message);
+    goLogin(message);
+  }
+
+  function centerDialog({ title = "确认操作", message, confirmText = "确定", cancelText = "取消", showCancel = true }) {
+    return new Promise((resolve) => {
+      const mask = $("#confirmModal");
+      $("#confirmTitle").textContent = title;
+      $("#confirmMessage").textContent = message;
+      $("#confirmOkBtn").textContent = confirmText;
+      $("#confirmCancelBtn").textContent = cancelText;
+      $("#confirmCancelBtn").style.display = showCancel ? "inline-flex" : "none";
+      mask.classList.add("show");
+
+      const cleanup = (value) => {
+        mask.classList.remove("show");
+        $("#confirmOkBtn").removeEventListener("click", onOk);
+        $("#confirmCancelBtn").removeEventListener("click", onCancel);
+        mask.removeEventListener("click", onMask);
+        resolve(value);
+      };
+      const onOk = () => cleanup(true);
+      const onCancel = () => cleanup(false);
+      const onMask = (event) => {
+        if (event.target.id === "confirmModal") cleanup(false);
+      };
+
+      $("#confirmOkBtn").addEventListener("click", onOk);
+      $("#confirmCancelBtn").addEventListener("click", onCancel);
+      mask.addEventListener("click", onMask);
+    });
+  }
+
+  async function loadCurrentUser() {
+    if (state.userLoaded) return;
+    state.userLoaded = true;
+    state.currentUser = null;
+    if (!UniTour.token()) return;
+    try {
+      state.currentUser = await UniTour.me();
+    } catch (error) {
+      if (isLoginError(error)) {
+        UniTour.setToken("");
+      }
+    }
+  }
+
+  function canDeleteUserContent(userId) {
+    return Boolean(state.currentUser?.id && String(state.currentUser.id) === String(userId));
   }
 
   function campusCard(campus) {
@@ -196,12 +306,20 @@
   }
 
   function reviewCard(review) {
-    const replies = (review.replies || []).map((reply) => `
-      <div class="notice">
-        <b>${UniTour.escapeHtml(reply.nickname || "用户")}</b>：${UniTour.escapeHtml(reply.content)}
-      </div>
-    `).join("");
+    const replies = review.replies || [];
     const replyCount = Number(review.replyCount || (review.replies || []).length || 0);
+    const visibleReplies = replies.slice(0, 20);
+    const hiddenReplies = replies.slice(20);
+    const replyHtml = (reply) => `
+      <div class="reply-item">
+        <div>
+          <b>${UniTour.escapeHtml(reply.nickname || "用户")}</b>
+          <span>${UniTour.escapeHtml(String(reply.createTime || "").replace("T", " "))}</span>
+          <p>${UniTour.escapeHtml(reply.content)}</p>
+        </div>
+        ${canDeleteUserContent(reply.userId) ? `<button class="text-danger" data-delete-reply="${reply.id}" type="button">删除</button>` : ""}
+      </div>
+    `;
     return `
       <article class="comment-card">
         <div class="comment-head">
@@ -211,7 +329,10 @@
             <span class="tag">${review.campusName ? UniTour.escapeHtml(review.campusName) : "全校评价"}</span>
             ${hasScore(review) ? `<span class="tag hot">综合 ${UniTour.formatScore(review.overallScore)}</span>` : `<span class="tag">仅文字</span>`}
           </div>
-          <span style="color:var(--muted)">${UniTour.escapeHtml(String(review.createTime || "").replace("T", " "))}</span>
+          <div class="comment-meta">
+            <span>${UniTour.escapeHtml(String(review.createTime || "").replace("T", " "))}</span>
+            ${canDeleteUserContent(review.userId) ? `<button class="text-danger" data-delete-review="${review.id}" type="button">删除评价</button>` : ""}
+          </div>
         </div>
         ${reviewScoreGrid(review)}
         <p style="font-size:1.02rem;margin-bottom:0">${UniTour.escapeHtml(review.content)}</p>
@@ -231,13 +352,20 @@
             <span>${replyCount}</span>
           </button>
         </div>
-        <button class="reply-toggle" data-reply-toggle="${review.id}" data-label="${replyCount > 0 ? `查看 ${replyCount} 条回复` : "添加回复"}" type="button">
-          ${replyCount > 0 ? `查看 ${replyCount} 条回复` : "添加回复"}
-        </button>
-        <div class="reply-panel" id="reply-panel-${review.id}">
-          <div class="field"><textarea id="reply-input-${review.id}" placeholder="回复这条评价..."></textarea></div>
-          <button class="btn primary" data-reply-submit="${review.id}" type="button">提交回复</button>
-          ${replies || `<div class="empty">暂无回复。</div>`}
+        <div class="reply-panel show" id="reply-panel-${review.id}">
+          <div class="reply-list">
+            ${visibleReplies.length ? visibleReplies.map(replyHtml).join("") : `<div class="empty">暂无回复。</div>`}
+            ${hiddenReplies.length ? `
+              <div class="reply-extra" id="reply-extra-${review.id}">
+                ${hiddenReplies.map(replyHtml).join("")}
+              </div>
+              <button class="reply-toggle" data-replies-expand="${review.id}" type="button">展开剩余 ${hiddenReplies.length} 条回复</button>
+            ` : ""}
+          </div>
+          <div class="reply-composer" id="reply-composer-${review.id}">
+            <div class="field"><textarea id="reply-input-${review.id}" placeholder="回复这条评价..."></textarea></div>
+            <button class="btn primary" data-reply-submit="${review.id}" type="button">提交回复</button>
+          </div>
         </div>
       </article>
     `;
@@ -277,8 +405,18 @@
       document.title = `${detail.name} | UniTour`;
       $("#uniName").textContent = detail.name;
       $("#uniDesc").textContent = detail.description || "";
+      $("#summaryName").textContent = detail.name;
+      $("#introText").textContent = detail.description || "暂无学校简介。";
       $("#poiLink").href = `/campus-pois.html?universityId=${detail.id}`;
       $("#uniMeta").textContent = `${detail.province || "-"} · ${detail.city || "-"} / ${detail.schoolType || "高校"} / ${detail.educationLevel || "本科"}`;
+      $("#summaryScore").textContent = UniTour.formatScore(detail.rating?.overallScore);
+      $("#summaryReviewCount").textContent = `${detail.rating?.reviewCount || 0} 条评价`;
+      $("#officialLink").href = detail.officialWebsite || detail.logoUrl || "#";
+      const favicon = iconUrl(detail);
+      const fallback = UniTour.escapeHtml((detail.shortName || detail.name || "U").slice(0, 2));
+      $("#detailLogo").innerHTML = favicon
+        ? `<img src="${favicon}" alt="${UniTour.escapeHtml(detail.name)}图标" onerror="this.parentElement.innerHTML='${fallback}'">`
+        : fallback;
       $("#uniTags").innerHTML = [
         detail.is985 ? "985" : "非 985",
         detail.is211 ? "211" : "非 211",
@@ -300,6 +438,7 @@
   async function loadReviews() {
     $("#reviewList").innerHTML = `<div class="empty">正在加载评价...</div>`;
     try {
+      await loadCurrentUser();
       const page = await UniTour.reviews(id, { page: 1, size: 50 });
       const list = page.list || [];
       $("#reviewList").innerHTML = list.length ? list.map(reviewCard).join("") : `<div class="empty">暂无评价，点击“写评价”发布第一条。</div>`;
@@ -312,46 +451,133 @@
   function bindReviewActions() {
     document.querySelectorAll("[data-like]").forEach((button) => {
       button.addEventListener("click", async () => {
+        if (!UniTour.token()) {
+          redirectToLogin("当前未登录，即将跳转到登录注册页面。");
+          return;
+        }
+        const countNode = button.querySelector("span");
+        const wasLiked = button.classList.contains("liked");
+        const currentCount = Number(countNode?.textContent || 0);
+        button.disabled = true;
         try {
-          if (button.classList.contains("liked")) {
+          if (wasLiked) {
             await UniTour.unlikeReview(button.dataset.like);
           } else {
             await UniTour.likeReview(button.dataset.like);
           }
-          await loadReviews();
+          button.classList.toggle("liked", !wasLiked);
+          if (countNode) {
+            countNode.textContent = String(Math.max(0, currentCount + (wasLiked ? -1 : 1)));
+          }
         } catch (error) {
+          if (isLoginError(error)) {
+            UniTour.setToken("");
+            redirectToLogin("当前登录状态已失效，即将跳转到登录注册页面。");
+            return;
+          }
           alert(`操作失败：${error.message}`);
+        } finally {
+          button.disabled = false;
         }
       });
     });
     document.querySelectorAll("[data-reply]").forEach((button) => {
       button.addEventListener("click", () => {
-        const panel = document.querySelector(`#reply-panel-${button.dataset.reply}`);
-        panel.classList.toggle("show");
+        if (!UniTour.token()) {
+          redirectToLogin("当前未登录，即将跳转到登录注册页面。");
+          return;
+        }
+        const composer = document.querySelector(`#reply-composer-${button.dataset.reply}`);
+        composer?.classList.toggle("show");
+        document.querySelector(`#reply-input-${button.dataset.reply}`)?.focus();
       });
     });
-    document.querySelectorAll("[data-reply-toggle]").forEach((button) => {
+    document.querySelectorAll("[data-replies-expand]").forEach((button) => {
       button.addEventListener("click", () => {
-        const panel = document.querySelector(`#reply-panel-${button.dataset.replyToggle}`);
-        panel.classList.toggle("show");
-        button.textContent = panel.classList.contains("show") ? "收起回复" : button.dataset.label;
+        document.querySelector(`#reply-extra-${button.dataset.repliesExpand}`)?.classList.add("show");
+        button.remove();
       });
     });
     document.querySelectorAll("[data-reply-submit]").forEach((button) => {
       button.addEventListener("click", async () => {
         const reviewId = button.dataset.replySubmit;
         const input = document.querySelector(`#reply-input-${reviewId}`);
+        if (!UniTour.token()) {
+          redirectToLogin("当前未登录，即将跳转到登录注册页面。");
+          return;
+        }
         try {
           await UniTour.createReply(reviewId, { content: input.value.trim() });
           await loadReviews();
         } catch (error) {
+          if (isLoginError(error)) {
+            UniTour.setToken("");
+            redirectToLogin("当前登录状态已失效，即将跳转到登录注册页面。");
+            return;
+          }
           alert(`回复失败：${error.message}`);
+        }
+      });
+    });
+    document.querySelectorAll("[data-delete-review]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        if (!UniTour.token()) {
+          redirectToLogin("当前未登录，即将跳转到登录注册页面。");
+          return;
+        }
+        const confirmed = await centerDialog({
+          title: "删除评价",
+          message: "确认删除这条评价吗？删除后评价内容、评分展示和回复入口都会从当前列表移除。",
+          confirmText: "删除"
+        });
+        if (!confirmed) return;
+        try {
+          await UniTour.deleteReview(button.dataset.deleteReview);
+          await loadDetail();
+        } catch (error) {
+          if (isLoginError(error)) {
+            UniTour.setToken("");
+            redirectToLogin("当前登录状态已失效，即将跳转到登录注册页面。");
+            return;
+          }
+          await centerDialog({ title: "删除评价失败", message: error.message, showCancel: false });
+        }
+      });
+    });
+    document.querySelectorAll("[data-delete-reply]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        if (!UniTour.token()) {
+          redirectToLogin("当前未登录，即将跳转到登录注册页面。");
+          return;
+        }
+        const confirmed = await centerDialog({
+          title: "删除回复",
+          message: "确认删除这条回复吗？删除后该回复会从当前评价下移除。",
+          confirmText: "删除"
+        });
+        if (!confirmed) return;
+        try {
+          await UniTour.deleteReply(button.dataset.deleteReply);
+          await loadReviews();
+        } catch (error) {
+          if (isLoginError(error)) {
+            UniTour.setToken("");
+            redirectToLogin("当前登录状态已失效，即将跳转到登录注册页面。");
+            return;
+          }
+          await centerDialog({ title: "删除回复失败", message: error.message, showCancel: false });
         }
       });
     });
   }
 
   function openModal() {
+    if (!UniTour.token()) {
+      $("#reviewMessage").textContent = "当前未登录，即将跳转到登录注册页面。";
+      $("#reviewModal").classList.add("show");
+      goLogin();
+      return;
+    }
     $("#reviewModal").classList.add("show");
   }
 
@@ -391,6 +617,10 @@
       await loadDetail();
     } catch (error) {
       $("#reviewMessage").textContent = `提交失败：${error.message}`;
+      if (isLoginError(error)) {
+        UniTour.setToken("");
+        goLogin("当前登录状态已失效，即将跳转到登录注册页面。");
+      }
     }
   });
 

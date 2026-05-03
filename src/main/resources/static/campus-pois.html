@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>校区 POI | UniTour</title>
-  <link rel="stylesheet" href="/css/unitour.css?v=20260503b">
+  <link rel="stylesheet" href="/css/unitour.css?v=20260503i">
 </head>
 <body>
 <header class="topbar">
@@ -16,9 +16,7 @@
     <nav class="nav">
       <a href="/index.html">首页</a>
       <a href="/universities.html">高校库</a>
-      <a class="active" href="/campus-pois.html">校区 POI</a>
-      <a href="/open-day.html">项目亮点</a>
-      <a href="/auth-center.html">登录</a>
+      <a class="active" href="/campus-pois.html">POI</a>
     </nav>
   </div>
 </header>
@@ -33,32 +31,19 @@
   </section>
 
   <section class="section">
-    <div class="shell split">
-      <div>
-        <div class="toolbar" style="grid-template-columns:1fr auto auto auto">
-          <div class="field">
-            <label for="universitySelect">选择高校</label>
-            <select id="universitySelect"></select>
-          </div>
-          <button class="btn primary" id="loadUniversityBtn" type="button">加载校区</button>
-          <a class="btn line" href="/universities.html">返回高校库</a>
-          <a class="btn line" id="reviewLink" href="/university-detail.html?id=1#reviews">看评价</a>
+    <div class="shell">
+      <div class="toolbar" style="grid-template-columns:1fr auto auto auto">
+        <div class="field">
+          <label for="universitySelect">选择高校</label>
+          <select id="universitySelect"></select>
         </div>
-
-        <div class="notice" id="campusSummary">正在加载高校列表...</div>
-        <div class="campus-list" id="campusList" style="margin-top:14px"></div>
+        <button class="btn primary" id="loadUniversityBtn" type="button">加载校区</button>
+        <a class="btn line" href="/universities.html">返回高校库</a>
+        <a class="btn line" id="reviewLink" href="/university-detail.html?id=1#reviews">看评价</a>
       </div>
 
-      <aside class="side-panel">
-        <h3>POI 地图视图</h3>
-        <p>当前是轻量静态地图，用点位卡片表达校园结构。后续可以接入真实地图 SDK。</p>
-        <div class="mini-map">
-          <span class="a">图书馆</span>
-          <span class="b">教学楼</span>
-          <span class="c">食堂</span>
-          <span class="d">体育场</span>
-        </div>
-      </aside>
+      <div class="notice" id="campusSummary">正在加载高校列表...</div>
+      <div class="campus-list" id="campusList" style="margin-top:14px"></div>
     </div>
   </section>
 </main>
@@ -70,7 +55,8 @@
   </div>
 </footer>
 
-<script src="/js/unitour-api.js"></script>
+<script src="/js/unitour-api.js?v=20260503e"></script>
+<script src="/js/unitour-user-menu.js?v=20260503e"></script>
 <script>
   const select = document.querySelector("#universitySelect");
   const list = document.querySelector("#campusList");
@@ -112,7 +98,7 @@
           <span class="tag">热度 ${campus.hotScore || 0}</span>
           <span class="tag">POI ${pois.length}</span>
         </div>
-        <div class="poi-list" style="margin-top:12px">
+        <div class="poi-list compact" style="margin-top:12px">
           ${error ? `<div class="error">POI 加载失败：${UniTour.escapeHtml(error)}</div>` : ""}
           ${pois.length ? pois.map(poiHtml).join("") : `<div class="empty">当前校区暂未维护 POI。</div>`}
         </div>

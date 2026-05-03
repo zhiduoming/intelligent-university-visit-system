@@ -13,4 +13,6 @@ public class UpdateProfileDTO {
     private String highSchool;
     private Long targetUniId;
     private Long currentUniId;
+    private String targetUniName;
+    private String currentUniName;
 }

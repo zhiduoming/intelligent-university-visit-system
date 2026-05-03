@@ -143,6 +143,19 @@ http://localhost:8080
 mvn -q -DskipTests compile
 ```
 
+## 数据库初始化
+
+全新本地数据库只需要按顺序执行：
+
+```text
+src/main/database/schema.sql
+src/main/database/init_info.sql
+```
+
+`schema.sql` 负责建库建表，`init_info.sql` 负责插入当前演示数据。当前数据库脚本已经整合，初始化不需要再执行额外的增量 SQL。
+
+演示用户的原始密码统一为 `123456`，数据库中保存的是 BCrypt 哈希。
+
 ## 当前主要功能
 
 - 用户注册、登录

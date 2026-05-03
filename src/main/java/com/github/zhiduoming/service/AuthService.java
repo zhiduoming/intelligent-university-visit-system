@@ -1,6 +1,7 @@
 package com.github.zhiduoming.service;
 
 import com.github.zhiduoming.dto.LoginDTO;
+import com.github.zhiduoming.dto.ForgotPasswordDTO;
 import com.github.zhiduoming.dto.RegisterDTO;
 import com.github.zhiduoming.vo.LoginVO;
 
@@ -14,4 +15,9 @@ public interface AuthService {
      * 校验登录信息并返回登录结果。
      */
     LoginVO login(LoginDTO dto);
+
+    /**
+     * 通过用户名和绑定手机号校验身份后重置密码。
+     */
+    void resetPassword(ForgotPasswordDTO dto);
 }

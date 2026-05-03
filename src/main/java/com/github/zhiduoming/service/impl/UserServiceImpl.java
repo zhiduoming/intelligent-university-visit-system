@@ -1,19 +1,26 @@
 package com.github.zhiduoming.service.impl;
 
 import com.github.zhiduoming.dto.UpdateProfileDTO;
+import com.github.zhiduoming.mapper.UniversityMapper;
 import com.github.zhiduoming.mapper.UserMapper;
 import com.github.zhiduoming.pojo.User;
 import com.github.zhiduoming.service.UserService;
+import com.github.zhiduoming.vo.UniversityDetailVO;
+import com.github.zhiduoming.vo.UniversityListVO;
 import com.github.zhiduoming.vo.UserVO;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
+    private final UniversityMapper universityMapper;
 
-    public UserServiceImpl(UserMapper userMapper) {
+    public UserServiceImpl(UserMapper userMapper, UniversityMapper universityMapper) {
         this.userMapper = userMapper;
+        this.universityMapper = universityMapper;
     }
 
     /**
@@ -50,10 +57,13 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("身份类型不合法");
         }
 
-        if (identityType == 1 && dto.getTargetUniId() == null) {
+        Long targetUniId = resolveUniversityId("目标高校", dto.getTargetUniId(), dto.getTargetUniName());
+        Long currentUniId = resolveUniversityId("当前高校", dto.getCurrentUniId(), dto.getCurrentUniName());
+
+        if (identityType == 1 && targetUniId == null) {
             throw new RuntimeException("高中生需要填写目标高校");
         }
-        if ((identityType == 2 || identityType == 3) && dto.getCurrentUniId() == null) {
+        if ((identityType == 2 || identityType == 3) && currentUniId == null) {
             throw new RuntimeException("在校生或校友需要填写当前就读高校");
         }
 
@@ -62,8 +72,8 @@ public class UserServiceImpl implements UserService {
         updateUser.setNickname(resolveNickname(dto.getNickname(), user));
         updateUser.setIdentityType(identityType);
         updateUser.setHighSchool(trimToNull(dto.getHighSchool()));
-        updateUser.setTargetUniId(dto.getTargetUniId());
-        updateUser.setCurrentUniId(dto.getCurrentUniId());
+        updateUser.setTargetUniId(targetUniId);
+        updateUser.setCurrentUniId(currentUniId);
         updateUser.setProfileCompleted(1);
 
         int rows = userMapper.updateProfile(updateUser);
@@ -92,15 +102,61 @@ public class UserServiceImpl implements UserService {
         return new UserVO(
                 user.getId(),
                 user.getUsername(),
+                user.getPhone(),
                 user.getNickname(),
                 user.getAvatarUrl(),
                 user.getRole(),
                 user.getIdentityType(),
                 user.getHighSchool(),
                 user.getTargetUniId(),
+                resolveUniversityName(user.getTargetUniId()),
                 user.getCurrentUniId(),
+                resolveUniversityName(user.getCurrentUniId()),
                 user.getProfileCompleted()
         );
+    }
+
+    /**
+     * 支持前端提交高校名称，同时保留高校 ID 提交能力以兼容旧请求。
+     */
+    private Long resolveUniversityId(String fieldName, Long universityId, String universityName) {
+        String trimmedName = trimToNull(universityName);
+        if (trimmedName == null) {
+            if (universityId != null) {
+                checkUniversityExists(fieldName, universityId);
+            }
+            return universityId;
+        }
+
+        List<UniversityListVO> universities = universityMapper.selectUniversitiesByExactName(trimmedName);
+        if (universities == null || universities.isEmpty()) {
+            throw new RuntimeException(fieldName + "不存在，请输入高校库中的完整名称或简称");
+        }
+        if (universities.size() > 1) {
+            throw new RuntimeException(fieldName + "名称不唯一，请输入完整高校名称");
+        }
+        return universities.get(0).getId();
+    }
+
+    /**
+     * 校验旧请求传入的高校 ID 是否真实存在。
+     */
+    private void checkUniversityExists(String fieldName, Long universityId) {
+        UniversityDetailVO university = universityMapper.selectUniversityById(universityId);
+        if (university == null) {
+            throw new RuntimeException(fieldName + "不存在");
+        }
+    }
+
+    /**
+     * 将用户表中保存的高校 ID 转成人能读懂的高校名称。
+     */
+    private String resolveUniversityName(Long universityId) {
+        if (universityId == null) {
+            return null;
+        }
+        UniversityDetailVO university = universityMapper.selectUniversityById(universityId);
+        return university == null ? null : university.getName();
     }
 
     /**

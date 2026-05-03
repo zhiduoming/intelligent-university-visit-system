@@ -25,6 +25,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/api/v1/auth/register",
                         "/api/v1/auth/login",
+                        "/api/v1/auth/forgot-password",
                         "/api/v1/universities",
                         "/api/v1/universities/*",
                         "/api/v1/campuses/**",
@@ -36,6 +37,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "/university-detail.html",
                         "/campus-pois.html",
                         "/auth-center.html",
+                        "/user-center.html",
                         "/reviews.html",
                         "/wishes.html",
                         "/open-day.html",

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>认证中心 | UniTour</title>
-  <link rel="stylesheet" href="/css/unitour.css?v=20260503b">
+  <link rel="stylesheet" href="/css/unitour.css?v=20260503i">
 </head>
 <body>
 <header class="topbar">
@@ -16,75 +16,89 @@
     <nav class="nav">
       <a href="/index.html">首页</a>
       <a href="/universities.html">高校库</a>
-      <a href="/campus-pois.html">校区 POI</a>
-      <a href="/open-day.html">项目亮点</a>
-      <a class="active" href="/auth-center.html">登录</a>
+      <a href="/campus-pois.html">POI</a>
     </nav>
   </div>
 </header>
 
 <main>
-  <section class="page-hero">
-    <div class="shell">
-      <span class="eyebrow" style="color:var(--teal-2);border-color:var(--line);background:#fffdf8">Auth Center</span>
-      <h1>认证不是孤立模块，它决定谁能发布评价、更新资料和沉淀个人择校轨迹。</h1>
-      <p>这里把注册、登录、JWT、本人与资料完善放在一个页面里，方便你演示后端权限闭环。</p>
-    </div>
-  </section>
+  <section class="auth-page">
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-auth-tab="login" type="button">登录</button>
+        <button class="auth-tab" data-auth-tab="register" type="button">注册</button>
+      </div>
 
-  <section class="section">
-    <div class="shell auth-grid">
-      <section class="form-panel">
-        <h3>登录</h3>
-        <div class="form-stack">
-          <div class="field"><label>用户名</label><input id="loginUsername" placeholder="username"></div>
-          <div class="field"><label>密码</label><input id="loginPassword" type="password" placeholder="password"></div>
-          <button class="btn primary" id="loginBtn" type="button">登录并保存 Token</button>
-          <div class="token-box" id="loginMsg"></div>
+      <section class="auth-form active" id="loginForm">
+        <label class="input-shell">
+          <span class="input-icon">□</span>
+          <input id="loginUsername" autocomplete="username" placeholder="用户名 / 手机号">
+        </label>
+        <label class="input-shell">
+          <span class="input-icon">▣</span>
+          <input id="loginPassword" autocomplete="current-password" type="password" placeholder="密码">
+          <button class="plain-icon-btn" data-toggle-password="loginPassword" type="button">显示</button>
+        </label>
+        <div class="auth-subline">
+          <span></span>
+          <a id="forgotLink" href="javascript:void(0)">忘记密码?</a>
         </div>
+        <button class="btn primary" id="loginBtn" type="button" style="width:100%;font-size:1.08rem">登录</button>
+        <div class="token-box" id="loginMsg"></div>
+        <div class="auth-divider">注册后可在个人中心进行学校验证</div>
       </section>
 
-      <section class="form-panel">
-        <h3>注册</h3>
-        <div class="form-stack">
-          <div class="field"><label>用户名</label><input id="registerUsername" placeholder="new_user"></div>
-          <div class="field"><label>昵称</label><input id="registerNickname" placeholder="准备择校的同学"></div>
-          <div class="field"><label>密码</label><input id="registerPassword" type="password" placeholder="password"></div>
-          <button class="btn line" id="registerBtn" type="button">创建账号</button>
-          <div class="token-box" id="registerMsg"></div>
+      <section class="auth-form" id="registerForm">
+        <label class="input-shell">
+          <span class="input-icon">人</span>
+          <input id="registerNickname" autocomplete="nickname" placeholder="昵称（选填，登录后可修改）">
+        </label>
+        <label class="input-shell">
+          <span class="input-icon">□</span>
+          <input id="registerUsername" autocomplete="username" placeholder="用户名">
+        </label>
+        <label class="input-shell">
+          <span class="input-icon">手</span>
+          <input id="registerPhone" autocomplete="tel" placeholder="手机号（用于手机号登录和找回密码）">
+        </label>
+        <label class="input-shell">
+          <span class="input-icon">▣</span>
+          <input id="registerPassword" autocomplete="new-password" type="password" placeholder="密码">
+          <button class="plain-icon-btn" data-toggle-password="registerPassword" type="button">显示</button>
+        </label>
+        <div class="captcha-row">
+          <label class="input-shell">
+            <span class="input-icon">验</span>
+            <input id="captchaInput" placeholder="请输入验证码">
+          </label>
+          <button class="captcha-box" id="captchaBox" type="button">5DjQ</button>
         </div>
+        <button class="btn primary" id="registerBtn" type="button" style="width:100%;font-size:1.08rem">注册</button>
+        <div class="token-box" id="registerMsg"></div>
+        <div class="auth-divider">注册后可在个人中心进行学校验证</div>
       </section>
 
-      <section class="form-panel">
-        <h3>当前登录状态</h3>
-        <p>Token 会保存在浏览器 localStorage 中，评价页会自动携带。</p>
-        <div class="token-box" id="tokenBox"></div>
-        <div class="actions" style="margin-top:12px">
-          <button class="btn primary" id="meBtn" type="button">查看当前用户</button>
-          <button class="btn line" id="logoutBtn" type="button">退出登录</button>
+      <section class="auth-form" id="forgotForm">
+        <label class="input-shell">
+          <span class="input-icon">□</span>
+          <input id="forgotUsername" autocomplete="username" placeholder="用户名">
+        </label>
+        <label class="input-shell">
+          <span class="input-icon">手</span>
+          <input id="forgotPhone" autocomplete="tel" placeholder="绑定手机号">
+        </label>
+        <label class="input-shell">
+          <span class="input-icon">▣</span>
+          <input id="forgotPassword" autocomplete="new-password" type="password" placeholder="新密码，不少于 6 位">
+          <button class="plain-icon-btn" data-toggle-password="forgotPassword" type="button">显示</button>
+        </label>
+        <div class="auth-subline">
+          <a id="backToLoginLink" href="javascript:void(0)">返回登录</a>
+          <span></span>
         </div>
-        <pre class="token-box" id="meBox" style="white-space:pre-wrap"></pre>
-      </section>
-
-      <section class="form-panel">
-        <h3>完善资料</h3>
-        <p>主评价需要资料完善，这是为了让评分数据更可信。</p>
-        <div class="form-stack">
-          <div class="field"><label>昵称</label><input id="profileNickname" placeholder="昵称"></div>
-          <div class="field">
-            <label>身份</label>
-            <select id="identityType">
-              <option value="1">高中生 / 准大学生</option>
-              <option value="2">在校大学生</option>
-              <option value="3">毕业生</option>
-            </select>
-          </div>
-          <div class="field"><label>高中</label><input id="highSchool" placeholder="可选"></div>
-          <div class="field"><label>目标高校 ID</label><input id="targetUniId" placeholder="例如 1"></div>
-          <div class="field"><label>当前高校 ID</label><input id="currentUniId" placeholder="例如 1"></div>
-          <button class="btn primary" id="profileBtn" type="button">保存资料</button>
-          <div class="token-box" id="profileMsg"></div>
-        </div>
+        <button class="btn primary" id="forgotBtn" type="button" style="width:100%;font-size:1.08rem">重置密码</button>
+        <div class="token-box" id="forgotMsg"></div>
+        <div class="auth-divider">当前版本使用绑定手机号辅助验证，不接入短信验证码。</div>
       </section>
     </div>
   </section>
@@ -97,19 +111,51 @@
   </div>
 </footer>
 
-<script src="/js/unitour-api.js"></script>
+<script src="/js/unitour-api.js?v=20260503f"></script>
+<script src="/js/unitour-user-menu.js?v=20260503e"></script>
 <script>
   const $ = (id) => document.querySelector(id);
+  const redirect = UniTour.qs("redirect") || "/user-center.html";
 
-  function refreshTokenBox() {
-    const token = UniTour.token();
-    $("#tokenBox").textContent = token ? `当前 Token：${token}` : "当前未登录。";
+  function switchTab(name) {
+    document.querySelectorAll("[data-auth-tab]").forEach((button) => {
+      button.classList.toggle("active", button.dataset.authTab === name);
+    });
+    $("#loginForm").classList.toggle("active", name === "login");
+    $("#registerForm").classList.toggle("active", name === "register");
+    $("#forgotForm").classList.toggle("active", name === "forgot");
   }
 
-  function nullableNumber(id) {
-    const value = $(id).value.trim();
-    return value ? Number(value) : null;
+  function captchaText() {
+    const source = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    return Array.from({ length: 4 }, () => source[Math.floor(Math.random() * source.length)]).join("");
   }
+
+  document.querySelectorAll("[data-auth-tab]").forEach((button) => {
+    button.addEventListener("click", () => switchTab(button.dataset.authTab));
+  });
+
+  document.querySelectorAll("[data-toggle-password]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const input = document.querySelector(`#${button.dataset.togglePassword}`);
+      const showing = input.type === "text";
+      input.type = showing ? "password" : "text";
+      button.textContent = showing ? "显示" : "隐藏";
+    });
+  });
+
+  $("#captchaBox").addEventListener("click", () => {
+    $("#captchaBox").textContent = captchaText();
+  });
+
+  $("#forgotLink").addEventListener("click", () => {
+    $("#forgotUsername").value = $("#loginUsername").value.trim();
+    switchTab("forgot");
+  });
+
+  $("#backToLoginLink").addEventListener("click", () => {
+    switchTab("login");
+  });
 
   $("#loginBtn").addEventListener("click", async () => {
     $("#loginMsg").textContent = "正在登录...";
@@ -120,7 +166,9 @@
       });
       UniTour.setToken(data.token);
       $("#loginMsg").textContent = `登录成功：${data.nickname || data.username}`;
-      refreshTokenBox();
+      setTimeout(() => {
+        location.href = redirect;
+      }, 500);
     } catch (error) {
       $("#loginMsg").textContent = `登录失败：${error.message}`;
     }
@@ -128,57 +176,42 @@
 
   $("#registerBtn").addEventListener("click", async () => {
     $("#registerMsg").textContent = "正在注册...";
+    const captcha = $("#captchaInput").value.trim();
+    if (captcha && captcha.toLowerCase() !== $("#captchaBox").textContent.trim().toLowerCase()) {
+      $("#registerMsg").textContent = "验证码不正确。当前验证码只做前端占位，后续可以接后端接口。";
+      return;
+    }
     try {
       await UniTour.register({
         username: $("#registerUsername").value.trim(),
+        phone: $("#registerPhone").value.trim(),
         nickname: $("#registerNickname").value.trim(),
         password: $("#registerPassword").value
       });
       $("#registerMsg").textContent = "注册成功，现在可以登录。";
+      switchTab("login");
+      $("#loginUsername").value = $("#registerUsername").value.trim();
     } catch (error) {
       $("#registerMsg").textContent = `注册失败：${error.message}`;
     }
   });
 
-  $("#meBtn").addEventListener("click", async () => {
-    $("#meBox").textContent = "正在读取...";
+  $("#forgotBtn").addEventListener("click", async () => {
+    $("#forgotMsg").textContent = "正在重置密码...";
     try {
-      const data = await UniTour.me();
-      $("#meBox").textContent = JSON.stringify(data, null, 2);
-      $("#profileNickname").value = data.nickname || "";
-      $("#identityType").value = data.identityType || 1;
-      $("#highSchool").value = data.highSchool || "";
-      $("#targetUniId").value = data.targetUniId || "";
-      $("#currentUniId").value = data.currentUniId || "";
-    } catch (error) {
-      $("#meBox").textContent = `读取失败：${error.message}`;
-    }
-  });
-
-  $("#logoutBtn").addEventListener("click", () => {
-    UniTour.setToken("");
-    refreshTokenBox();
-    $("#meBox").textContent = "";
-  });
-
-  $("#profileBtn").addEventListener("click", async () => {
-    $("#profileMsg").textContent = "正在保存...";
-    try {
-      const data = await UniTour.updateProfile({
-        nickname: $("#profileNickname").value.trim(),
-        identityType: Number($("#identityType").value),
-        highSchool: $("#highSchool").value.trim(),
-        targetUniId: nullableNumber("#targetUniId"),
-        currentUniId: nullableNumber("#currentUniId")
+      await UniTour.forgotPassword({
+        username: $("#forgotUsername").value.trim(),
+        phone: $("#forgotPhone").value.trim(),
+        newPassword: $("#forgotPassword").value
       });
-      $("#profileMsg").textContent = `保存成功，资料完善状态：${data.profileCompleted}`;
-      $("#meBox").textContent = JSON.stringify(data, null, 2);
+      $("#forgotMsg").textContent = "密码已重置，现在可以用用户名或手机号登录。";
+      $("#loginUsername").value = $("#forgotUsername").value.trim();
+      $("#loginPassword").value = "";
+      setTimeout(() => switchTab("login"), 600);
     } catch (error) {
-      $("#profileMsg").textContent = `保存失败：${error.message}`;
+      $("#forgotMsg").textContent = `重置失败：${error.message}`;
     }
   });
-
-  refreshTokenBox();
 </script>
 </body>
 </html>

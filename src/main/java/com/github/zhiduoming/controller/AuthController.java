@@ -1,5 +1,6 @@
 package com.github.zhiduoming.controller;
 
+import com.github.zhiduoming.dto.ForgotPasswordDTO;
 import com.github.zhiduoming.dto.LoginDTO;
 import com.github.zhiduoming.dto.RegisterDTO;
 import com.github.zhiduoming.vo.LoginVO;
@@ -38,6 +39,16 @@ public class AuthController {
         //调用 service 层
        LoginVO loginVO = authService.login(dto);
         return Result.success(loginVO);
+    }
+
+    /**
+     * 使用用户名和绑定手机号辅助验证，验证通过后重置密码。
+     */
+    @PostMapping("/forgot-password")
+    public Result forgotPassword(@RequestBody ForgotPasswordDTO dto) {
+        log.info("忘记密码：username={}", dto == null ? null : dto.getUsername());
+        authService.resetPassword(dto);
+        return Result.success();
     }
 
 }

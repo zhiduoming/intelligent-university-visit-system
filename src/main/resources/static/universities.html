@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>高校库 | UniTour</title>
-  <link rel="stylesheet" href="/css/unitour.css?v=20260503b">
+  <link rel="stylesheet" href="/css/unitour.css?v=20260503i">
 </head>
 <body>
 <header class="topbar">
@@ -16,25 +16,29 @@
     <nav class="nav">
       <a href="/index.html">首页</a>
       <a class="active" href="/universities.html">高校库</a>
-      <a href="/campus-pois.html">校区 POI</a>
-      <a href="/open-day.html">项目亮点</a>
-      <a href="/auth-center.html">登录</a>
+      <a href="/campus-pois.html">POI</a>
     </nav>
   </div>
 </header>
 
 <main>
-  <section class="page-hero">
-    <div class="shell">
-      <span class="eyebrow" style="color:var(--teal-2);border-color:var(--line);background:#fffdf8">University Atlas</span>
-      <h1>先选学校，再进入完整详情页。</h1>
-      <p>高校库只负责清晰浏览和筛选，不把复杂详情挤在右侧小空间里。点击高校卡片后进入独立详情页，校区、POI、评分和评论都在那里展开。</p>
+  <section class="catalog-hero">
+    <div class="shell catalog-hero-inner">
+      <div>
+        <span class="eyebrow light">University Atlas</span>
+        <h1>高校库</h1>
+        <p>按学校、地区和城市筛选，先判断一所学校最值得关注的校园体验，再进入详情页看校区、POI、评分和评价。</p>
+      </div>
+      <div class="catalog-hero-stat">
+        <strong>20</strong>
+        <span>已维护高校</span>
+      </div>
     </div>
   </section>
 
-  <section class="section">
+  <section class="section catalog-section">
     <div class="shell">
-      <div class="toolbar">
+      <div class="toolbar catalog-toolbar">
         <div class="field">
           <label for="keyword">关键词</label>
           <input id="keyword" placeholder="北邮 / 电子 / 深圳">
@@ -50,13 +54,15 @@
         <button class="btn primary" id="searchBtn" type="button">查询</button>
       </div>
 
-      <div class="notice" id="summary">正在加载高校数据...</div>
-      <div class="uni-list catalog" id="list" style="margin-top:14px"></div>
+      <div class="catalog-result-bar">
+        <div class="notice compact" id="summary">正在加载高校数据...</div>
+        <span id="pageText" style="color:var(--muted);font-weight:750"></span>
+      </div>
+      <div class="uni-list catalog" id="list"></div>
 
-      <div class="actions" style="margin-top:18px">
+      <div class="actions catalog-pager">
         <button class="btn line" id="prevBtn" type="button">上一页</button>
         <button class="btn line" id="nextBtn" type="button">下一页</button>
-        <span id="pageText" style="color:var(--muted);font-weight:750"></span>
       </div>
     </div>
   </section>
@@ -69,22 +75,27 @@
   </div>
 </footer>
 
-<script src="/js/unitour-api.js"></script>
+<script src="/js/unitour-api.js?v=20260503e"></script>
+<script src="/js/unitour-user-menu.js?v=20260503e"></script>
 <script>
   const state = { page: 1, size: 9, total: 0, keyword: "", province: "", city: "" };
   const $ = (id) => document.querySelector(id);
 
   function iconUrl(item) {
+    if (item.logoUrl) return item.logoUrl;
     try {
-      const url = new URL(item.officialWebsite || item.logoUrl || "");
+      const url = new URL(item.officialWebsite || "");
       return `${url.origin}/favicon.ico`;
     } catch {
       return "";
     }
   }
 
-  function tagHtml(item) {
-    return UniTour.tags(item.tags).slice(0, 5)
+  function tagHtml(item, excludedTags = []) {
+    const excluded = new Set(excludedTags);
+    return UniTour.tags(item.tags)
+      .filter((tag) => !excluded.has(tag))
+      .slice(0, 5)
       .map((tag) => `<span class="tag ${tag.includes("985") || tag.includes("211") || tag.includes("双一流") ? "hot" : ""}">${UniTour.escapeHtml(tag)}</span>`)
       .join("");
   }
@@ -92,27 +103,44 @@
   function universityCard(item) {
     const favicon = iconUrl(item);
     const fallback = UniTour.escapeHtml((item.shortName || item.name || "U").slice(0, 2));
+    const reviewCount = item.reviewCount || 0;
+    const score = item.overallScore ? UniTour.formatScore(item.overallScore) : "-";
+    const focus = item.description || "暂无认知重点，后续可从校区、POI 和评价中继续补充。";
+    const primaryTags = [
+      item.is985 ? "985" : "",
+      item.is211 ? "211" : "",
+      item.isDoubleFirstClass ? "双一流" : ""
+    ].filter(Boolean);
     return `
       <article class="uni-card">
-        <div class="uni-card-top">
-          <div class="school-logo">
-            ${favicon ? `<img src="${favicon}" alt="${UniTour.escapeHtml(item.name)}图标" onerror="this.remove();this.parentElement.textContent='${fallback}'">` : fallback}
+        <a class="uni-card-link" href="/university-detail.html?id=${item.id}" aria-label="进入${UniTour.escapeHtml(item.name)}详情页"></a>
+        <div class="uni-card-head">
+          <div class="school-logo compact">
+            ${favicon ? `<img src="${favicon}" alt="${UniTour.escapeHtml(item.name)}校徽" onerror="this.parentElement.innerHTML='${fallback}'">` : fallback}
           </div>
-          <div>
+          <div class="uni-card-title">
             <h3>${UniTour.escapeHtml(item.name)}</h3>
-            <p>${UniTour.escapeHtml(item.description || "暂无介绍")}</p>
+            <p>${UniTour.escapeHtml(item.province || "-")} · ${UniTour.escapeHtml(item.city || "-")} · ${UniTour.escapeHtml(item.schoolType || "高校")} · ${UniTour.escapeHtml(item.educationLevel || "本科")}</p>
+          </div>
+          <div class="score-block">
+            <strong>${score}</strong>
+            <span>综合</span>
           </div>
         </div>
-        <div class="tags">
-          <span class="tag">${UniTour.escapeHtml(item.province || "-")} · ${UniTour.escapeHtml(item.city || "-")}</span>
-          <span class="tag">${UniTour.escapeHtml(item.schoolType || "高校")}</span>
-          <span class="tag">综合评分 ${UniTour.formatScore(item.overallScore)}</span>
-          <span class="tag">评价 ${item.reviewCount || 0}</span>
-          ${tagHtml(item)}
+        <div class="decision-tags">
+          ${primaryTags.map((tag) => `<span class="tag hot">${tag}</span>`).join("")}
+          ${tagHtml(item, primaryTags)}
         </div>
-        <div class="card-actions">
-          <a class="btn primary" href="/university-detail.html?id=${item.id}">进入详情页</a>
-          <a class="btn line" href="/campus-pois.html?universityId=${item.id}">校区 POI</a>
+        <div class="decision-focus">
+          <strong>认知重点</strong>
+          <p>${UniTour.escapeHtml(focus.length > 86 ? `${focus.slice(0, 86)}...` : focus)}</p>
+        </div>
+        <div class="uni-card-foot">
+          <span>${reviewCount} 条评价</span>
+          <div>
+            <a href="/university-detail.html?id=${item.id}">详情</a>
+            <a href="/campus-pois.html?universityId=${item.id}">POI</a>
+          </div>
         </div>
       </article>
     `;

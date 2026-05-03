@@ -22,6 +22,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
             return true;
         }
         if (isPublicReviewList(request)) {
+            attachUserIfPresent(request);
             return true;
         }
 
@@ -52,6 +53,25 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().write("{\"code\":0,\"msg\":\"NOT_LOGIN\",\"data\":null}");
+    }
+
+    /**
+     * 公开评价列表允许游客浏览；如果请求带了合法 JWT，则补充当前用户 ID，
+     * 让列表能返回 likedByCurrentUser 这类“可选登录态”字段。
+     */
+    private void attachUserIfPresent(HttpServletRequest request) {
+        String authorization = request.getHeader("Authorization");
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return;
+        }
+        String token = authorization.substring(7);
+        try {
+            Claims claims = JwtUtils.parseToken(token);
+            Long userId = Long.valueOf(claims.get("userId").toString());
+            request.setAttribute("userId", userId);
+        } catch (Exception ignored) {
+            request.removeAttribute("userId");
+        }
     }
 
     /**

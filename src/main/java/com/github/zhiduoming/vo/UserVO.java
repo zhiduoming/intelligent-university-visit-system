@@ -10,12 +10,15 @@ import lombok.NoArgsConstructor;
 public class UserVO {
     private Long id;
     private String username;
+    private String phone;
     private String nickname;
     private String avatarUrl;
     private Integer role;
     private Integer identityType;
     private String highSchool;
     private Long targetUniId;
+    private String targetUniName;
     private Long currentUniId;
+    private String currentUniName;
     private Integer profileCompleted;
 }

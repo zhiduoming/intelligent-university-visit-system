@@ -76,8 +76,16 @@ const UniTour = (() => {
     return request(`/universities/${universityId}/reviews`, { method: "POST", body });
   }
 
+  function deleteReview(reviewId) {
+    return request(`/reviews/${reviewId}`, { method: "DELETE" });
+  }
+
   function createReply(reviewId, body) {
     return request(`/reviews/${reviewId}/replies`, { method: "POST", body });
+  }
+
+  function deleteReply(replyId) {
+    return request(`/review-replies/${replyId}`, { method: "DELETE" });
   }
 
   function likeReview(reviewId) {
@@ -94,6 +102,10 @@ const UniTour = (() => {
 
   function register(body) {
     return request("/auth/register", { method: "POST", body });
+  }
+
+  function forgotPassword(body) {
+    return request("/auth/forgot-password", { method: "POST", body });
   }
 
   function me() {
@@ -158,11 +170,14 @@ const UniTour = (() => {
     campusPois,
     reviews,
     createReview,
+    deleteReview,
     createReply,
+    deleteReply,
     likeReview,
     unlikeReview,
     login,
     register,
+    forgotPassword,
     me,
     updateProfile,
     token,

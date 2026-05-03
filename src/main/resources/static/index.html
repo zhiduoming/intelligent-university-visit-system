@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UniTour | 高校多维认知与择校辅助系统</title>
-  <link rel="stylesheet" href="/css/unitour.css?v=20260503b">
+  <link rel="stylesheet" href="/css/unitour.css?v=20260503i">
 </head>
 <body>
 <header class="topbar">
@@ -16,9 +16,7 @@
     <nav class="nav">
       <a class="active" href="/index.html">首页</a>
       <a href="/universities.html">高校库</a>
-      <a href="/campus-pois.html">校区 POI</a>
-      <a href="/open-day.html">项目亮点</a>
-      <a href="/auth-center.html">登录</a>
+      <a href="/campus-pois.html">POI</a>
     </nav>
   </div>
 </header>
@@ -116,13 +114,12 @@
       </div>
 
       <aside class="side-panel">
-        <h3>项目亮点入口</h3>
+        <h3>核心入口</h3>
         <p>前端不是单页截图，而是围绕你已有后端接口组织出的多页面演示。</p>
         <div class="grid">
           <a class="btn dark" href="/universities.html">高校列表与详情</a>
           <a class="btn line" href="/campus-pois.html">校区 POI 下钻</a>
-          <a class="btn line" href="/auth-center.html">登录与个人资料</a>
-          <a class="btn line" href="/open-day.html">项目能力说明</a>
+          <a class="btn line" href="/user-center.html">用户中心</a>
         </div>
       </aside>
     </div>
@@ -136,7 +133,8 @@
   </div>
 </footer>
 
-<script src="/js/unitour-api.js"></script>
+<script src="/js/unitour-api.js?v=20260503e"></script>
+<script src="/js/unitour-user-menu.js?v=20260503e"></script>
 <script>
   const box = document.querySelector("#home-universities");
 
@@ -152,7 +150,7 @@
         </div>
         <div class="tags">${tags}</div>
         <div class="card-actions">
-          <a class="btn primary" href="/universities.html?id=${item.id}">查看详情</a>
+          <a class="btn primary" href="/university-detail.html?id=${item.id}">查看详情</a>
           <a class="btn line" href="/university-detail.html?id=${item.id}#reviews">看评价</a>
         </div>
       </article>

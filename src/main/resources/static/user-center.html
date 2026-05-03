@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户中心 | UniTour</title>
+  <link rel="stylesheet" href="/css/unitour.css?v=20260503i">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/index.html">
+      <span class="brand-mark">U</span>
+      <span>UniTour<small>用户中心</small></span>
+    </a>
+    <nav class="nav">
+      <a href="/index.html">首页</a>
+      <a href="/universities.html">高校库</a>
+      <a href="/campus-pois.html">POI</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="page-hero">
+    <div class="shell">
+      <span class="eyebrow" style="color:var(--teal-2);border-color:var(--line);background:#fffdf8">User Center</span>
+      <h1>个人资料和学校身份信息集中展示。</h1>
+      <p>这里调用当前用户接口，展示账号、昵称、身份、目标高校、当前高校和资料完善状态。后续学校认证、退出登录接口也可以从这里继续扩展。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell center-shell">
+      <aside class="profile-card profile-summary">
+        <div class="profile-avatar" id="profileAvatar">U</div>
+        <div>
+          <h2 id="profileName" style="margin-bottom:4px">未登录</h2>
+          <p id="profileStatus" style="margin:0;color:var(--muted)">请先登录后查看资料。</p>
+        </div>
+        <div class="actions">
+          <a class="btn primary" id="loginLink" href="/auth-center.html?redirect=/user-center.html">登录/注册</a>
+          <button class="btn line" id="logoutBtn" type="button">退出登录</button>
+        </div>
+      </aside>
+
+      <section class="profile-card">
+        <div class="profile-card-head">
+          <div>
+            <h2>完整资料</h2>
+            <p>主评价要求资料完善；回复、点赞不要求资料完善。</p>
+          </div>
+          <button class="btn line" id="editProfileBtn" type="button">编辑资料</button>
+        </div>
+
+        <div class="info-grid" id="profileInfo">
+          <div class="empty">正在读取当前用户资料...</div>
+        </div>
+      </section>
+    </div>
+  </section>
+</main>
+
+<div class="modal-mask" id="profileModal" aria-hidden="true">
+  <section class="modal profile-modal" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
+    <div class="modal-head">
+      <div>
+        <h2 id="profileModalTitle">编辑资料</h2>
+        <p>高校名称会由后端解析成高校 ID 后保存。</p>
+      </div>
+      <button class="close-btn" id="closeProfileModal" type="button" aria-label="关闭编辑资料弹窗">×</button>
+    </div>
+
+    <div class="form-stack">
+      <div class="field"><label for="profileNickname">昵称</label><input id="profileNickname" placeholder="昵称"></div>
+      <div class="field">
+        <label for="identityType">身份</label>
+        <select id="identityType">
+          <option value="1">高中生 / 准大学生</option>
+          <option value="2">在校大学生</option>
+          <option value="3">毕业生</option>
+          <option value="4">其他身份</option>
+        </select>
+      </div>
+      <div class="field"><label for="highSchool">高中</label><input id="highSchool" placeholder="可选"></div>
+      <div class="field"><label for="targetUniName">目标高校</label><input id="targetUniName" list="universityOptions" placeholder="高中生需要填写，例如 北京邮电大学"></div>
+      <div class="field"><label for="currentUniName">当前高校</label><input id="currentUniName" list="universityOptions" placeholder="大学生 / 毕业生需要填写，例如 北京邮电大学"></div>
+      <datalist id="universityOptions"></datalist>
+      <div class="modal-actions">
+        <span class="token-box" id="profileMsg"></span>
+        <div class="actions">
+          <button class="btn line" id="cancelProfileBtn" type="button">取消</button>
+          <button class="btn primary" id="profileBtn" type="button">保存资料</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer class="footer">
+  <div class="shell footer-inner">
+    <span>UniTour · 用户中心</span>
+    <span>Profile and verification placeholder</span>
+  </div>
+</footer>
+
+<script src="/js/unitour-api.js?v=20260503e"></script>
+<script src="/js/unitour-user-menu.js?v=20260503e"></script>
+<script>
+  const $ = (selector) => document.querySelector(selector);
+  let currentUser = null;
+  let universityOptionsLoaded = false;
+
+  function identityText(value) {
+    return ({ 1: "高中生 / 准大学生", 2: "在校大学生", 3: "毕业生", 4: "其他身份" })[value] || "未填写";
+  }
+
+  function infoItem(label, value) {
+    return `<div class="info-item"><span>${label}</span><b>${UniTour.escapeHtml(value ?? "未填写")}</b></div>`;
+  }
+
+  function fillProfileForm(user) {
+    $("#profileNickname").value = user?.nickname || "";
+    $("#identityType").value = user?.identityType || 1;
+    $("#highSchool").value = user?.highSchool || "";
+    $("#targetUniName").value = user?.targetUniName || "";
+    $("#currentUniName").value = user?.currentUniName || "";
+  }
+
+  function openProfileModal() {
+    if (!currentUser) return;
+    fillProfileForm(currentUser);
+    $("#profileMsg").textContent = "";
+    $("#profileModal").classList.add("show");
+    $("#profileModal").setAttribute("aria-hidden", "false");
+    $("#profileNickname").focus();
+  }
+
+  function closeProfileModal() {
+    $("#profileModal").classList.remove("show");
+    $("#profileModal").setAttribute("aria-hidden", "true");
+  }
+
+  async function loadUniversityOptions() {
+    if (universityOptionsLoaded) return;
+    try {
+      const data = await UniTour.listUniversities({ page: 1, size: 200 });
+      const list = data.list || [];
+      $("#universityOptions").innerHTML = list.map((item) => {
+        const name = UniTour.escapeHtml(item.name);
+        const shortName = item.shortName ? ` / ${UniTour.escapeHtml(item.shortName)}` : "";
+        const meta = `${UniTour.escapeHtml(item.province || "-")} · ${UniTour.escapeHtml(item.city || "-")}${shortName}`;
+        return `<option value="${name}" label="${meta}"></option>`;
+      }).join("");
+      universityOptionsLoaded = true;
+    } catch (error) {
+      $("#profileMsg").textContent = `高校候选列表加载失败：${error.message}`;
+    }
+  }
+
+  function renderUser(user) {
+    currentUser = user;
+    const name = user.nickname || user.username || "用户";
+    $("#profileName").textContent = name;
+    $("#profileStatus").textContent = user.profileCompleted === 1 ? "资料已完善" : "资料未完善";
+    $("#editProfileBtn").textContent = user.profileCompleted === 1 ? "编辑资料" : "完善资料";
+    $("#profileAvatar").innerHTML = user.avatarUrl
+      ? `<img src="${UniTour.escapeHtml(user.avatarUrl)}" alt="">`
+      : UniTour.escapeHtml(name.slice(0, 1).toUpperCase());
+
+    $("#profileInfo").innerHTML = [
+      infoItem("用户 ID", user.id),
+      infoItem("用户名", user.username),
+      infoItem("昵称", user.nickname),
+      infoItem("角色", user.role === 1 ? "普通用户" : user.role),
+      infoItem("身份类型", identityText(user.identityType)),
+      infoItem("高中", user.highSchool),
+      infoItem("目标高校", user.targetUniName || user.targetUniId),
+      infoItem("当前高校", user.currentUniName || user.currentUniId),
+      infoItem("资料完善", user.profileCompleted === 1 ? "是" : "否")
+    ].join("");
+
+    fillProfileForm(user);
+  }
+
+  async function loadUser() {
+    if (!UniTour.token()) {
+      $("#profileInfo").innerHTML = `<div class="empty">当前未登录，请先登录。</div>`;
+      $("#logoutBtn").style.display = "none";
+      $("#loginLink").style.display = "inline-flex";
+      $("#profileBtn").disabled = true;
+      $("#editProfileBtn").disabled = true;
+      $("#editProfileBtn").textContent = "完善资料";
+      return;
+    }
+    $("#logoutBtn").style.display = "inline-flex";
+    $("#loginLink").style.display = "none";
+    $("#profileBtn").disabled = false;
+    $("#editProfileBtn").disabled = false;
+    try {
+      const data = await UniTour.me();
+      renderUser(data);
+    } catch (error) {
+      $("#profileInfo").innerHTML = `<div class="error">读取失败：${UniTour.escapeHtml(error.message)}</div>`;
+      $("#profileBtn").disabled = true;
+      $("#editProfileBtn").disabled = true;
+    }
+  }
+
+  $("#logoutBtn").addEventListener("click", () => {
+    UniTour.setToken("");
+    location.href = "/index.html";
+  });
+
+  $("#editProfileBtn").addEventListener("click", openProfileModal);
+  $("#closeProfileModal").addEventListener("click", closeProfileModal);
+  $("#cancelProfileBtn").addEventListener("click", closeProfileModal);
+  $("#profileModal").addEventListener("click", (event) => {
+    if (event.target.id === "profileModal") {
+      closeProfileModal();
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && $("#profileModal").classList.contains("show")) {
+      closeProfileModal();
+    }
+  });
+
+  $("#profileBtn").addEventListener("click", async () => {
+    $("#profileMsg").textContent = "正在保存...";
+    try {
+      const data = await UniTour.updateProfile({
+        nickname: $("#profileNickname").value.trim(),
+        identityType: Number($("#identityType").value),
+        highSchool: $("#highSchool").value.trim(),
+        targetUniName: $("#targetUniName").value.trim(),
+        currentUniName: $("#currentUniName").value.trim()
+      });
+      $("#profileMsg").textContent = "保存成功。";
+      renderUser(data);
+      closeProfileModal();
+    } catch (error) {
+      $("#profileMsg").textContent = `保存失败：${error.message}`;
+    }
+  });
+
+  loadUniversityOptions();
+  loadUser();
+</script>
+</body>
+</html>

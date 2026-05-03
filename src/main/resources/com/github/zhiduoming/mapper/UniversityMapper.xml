@@ -83,4 +83,27 @@
         </where>
         ORDER BY id
     </select>
+
+    <select id="selectUniversitiesByExactName" resultType="com.github.zhiduoming.vo.UniversityListVO">
+        SELECT id,
+               name,
+               short_name,
+               description,
+               logo_url,
+               official_website,
+               is_985,
+               is_211,
+               is_double_first_class,
+               school_type,
+               education_level,
+               tags,
+               province,
+               city,
+               NULL AS overall_score,
+               0 AS review_count
+        FROM university
+        WHERE is_deleted = 0
+          AND (name = #{name} OR short_name = #{name})
+        ORDER BY CASE WHEN name = #{name} THEN 0 ELSE 1 END, id
+    </select>
 </mapper>

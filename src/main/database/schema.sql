@@ -71,6 +71,7 @@ CREATE TABLE users
 (
     id             BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '用户ID',
     username       VARCHAR(50)  NOT NULL COMMENT '用户名',
+    phone          VARCHAR(20) COMMENT '绑定手机号，用于手机号登录和忘记密码辅助验证',
     password       VARCHAR(100) NOT NULL COMMENT '密码哈希',
     nickname       VARCHAR(50) COMMENT '昵称',
     avatar_url     VARCHAR(255) COMMENT '头像链接',
@@ -85,6 +86,7 @@ CREATE TABLE users
     update_time    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     is_deleted     TINYINT      NOT NULL DEFAULT 0 COMMENT '逻辑删除',
     UNIQUE KEY uk_users_username (username),
+    UNIQUE KEY uk_users_phone (phone),
     KEY idx_users_target_uni_id (target_uni_id),
     KEY idx_users_current_uni_id (current_uni_id),
     KEY idx_users_deleted (is_deleted),

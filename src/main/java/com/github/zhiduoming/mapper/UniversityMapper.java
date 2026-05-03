@@ -28,4 +28,9 @@ public interface UniversityMapper {
                                                 @Param("province") String province,
                                                 @Param("city") String city);
 
+    /**
+     * 按高校全称或简称精确匹配，用于用户资料中把学校名称解析成高校 ID。
+     */
+    List<UniversityListVO> selectUniversitiesByExactName(@Param("name") String name);
+
 }

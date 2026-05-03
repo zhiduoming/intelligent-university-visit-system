@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class LoginVO {
     private Long id;
     private String username;
+    private String phone;
     private String nickname;
     private String token;
 }

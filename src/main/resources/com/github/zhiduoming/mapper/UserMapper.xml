@@ -4,14 +4,15 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.github.zhiduoming.mapper.UserMapper">
     <insert id="insert" parameterType="com.github.zhiduoming.pojo.User">
-        INSERT INTO users (username,password,nickname)
-        VALUES (#{username},#{password},#{nickname});
+        INSERT INTO users (username, phone, password, nickname)
+        VALUES (#{username}, #{phone}, #{password}, #{nickname});
     </insert>
 
     <select id="selectByUsername" resultType="com.github.zhiduoming.pojo.User">
         SELECT id,
         username,
         password,
+        phone,
         nickname,
         avatar_url,
         role,
@@ -29,9 +30,54 @@
         AND is_deleted = 0
         LIMIT 1
     </select>
+    <select id="selectByPhone" resultType="com.github.zhiduoming.pojo.User">
+        SELECT id,
+        username,
+        password,
+        phone,
+        nickname,
+        avatar_url,
+        role,
+        identity_type,
+        high_school,
+        target_uni_id,
+        current_uni_id,
+        profile_completed,
+        status,
+        create_time,
+        update_time,
+        is_deleted
+        FROM users
+        WHERE phone = #{phone}
+        AND is_deleted = 0
+        LIMIT 1
+    </select>
+    <select id="selectByUsernameOrPhone" resultType="com.github.zhiduoming.pojo.User">
+        SELECT id,
+        username,
+        password,
+        phone,
+        nickname,
+        avatar_url,
+        role,
+        identity_type,
+        high_school,
+        target_uni_id,
+        current_uni_id,
+        profile_completed,
+        status,
+        create_time,
+        update_time,
+        is_deleted
+        FROM users
+        WHERE (username = #{loginAccount} OR phone = #{loginAccount})
+        AND is_deleted = 0
+        LIMIT 1
+    </select>
     <select id="selectById" resultType="com.github.zhiduoming.pojo.User">
         SELECT id,
         username,
+        phone,
         nickname,
         avatar_url,
         role,
@@ -59,6 +105,15 @@
             current_uni_id = #{currentUniId},
             profile_completed = #{profileCompleted}
         WHERE id = #{id}
+          AND is_deleted = 0
+    </update>
+
+    <update id="updatePasswordByUsernameAndPhone">
+        UPDATE users
+        SET password = #{password}
+        WHERE username = #{username}
+          AND phone = #{phone}
+          AND status = 1
           AND is_deleted = 0
     </update>
 </mapper>

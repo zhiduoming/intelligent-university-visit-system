@@ -1,6 +1,6 @@
 # UniTour 种子数据来源说明
 
-本文件记录 `seed_university_campus_expansion.sql` 中高校、校区、部分 POI 数据的核对来源。
+本文件记录 `init_info.sql` 中高校、校区、部分 POI 数据的核对来源。
 
 数据用途：本地开发、接口测试、项目演示。
 
@@ -31,6 +31,16 @@
 
 ## POI 来源策略
 
-POI 只补充官网页面明确出现的点位，或者项目原有 BUPT POI 脚本中已经维护的点位。
+POI 只补充官网页面明确出现的点位，或者项目早期 BUPT POI 增量脚本中已经维护并合并进 `init_info.sql` 的点位。
 
 没有官方来源支撑的校区，不为了凑数量写“正门”“图书馆”“食堂”等看似合理但未核对的点位。
+
+## 校徽来源
+
+高校校徽图片最初来自 `srgaoxiao.cn` 的公开高校图标资源，当前已下载到项目本地：
+
+```text
+src/main/resources/static/images/university-logos/{universityId}.jpg
+```
+
+数据库中的 `university.logo_url` 指向本地静态路径，例如 `/images/university-logos/1.jpg`。
