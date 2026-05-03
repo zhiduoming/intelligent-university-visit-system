@@ -13,9 +13,22 @@ spring:
     redis:
       host: ${UNITOUR_REDIS_HOST:localhost}
       port: ${UNITOUR_REDIS_PORT:6379}
+  servlet:
+    multipart:
+      max-file-size: ${UNITOUR_MAX_FILE_SIZE:2MB}
+      max-request-size: ${UNITOUR_MAX_REQUEST_SIZE:2MB}
 
-#配置日志输出
+unitour:
+  oss:
+    endpoint: ${UNITOUR_OSS_ENDPOINT:}
+    access-key-id: ${UNITOUR_OSS_ACCESS_KEY_ID:}
+    access-key-secret: ${UNITOUR_OSS_ACCESS_KEY_SECRET:}
+    bucket-name: ${UNITOUR_OSS_BUCKET_NAME:}
+    public-base-url: ${UNITOUR_OSS_PUBLIC_BASE_URL:}
+    avatar-dir: ${UNITOUR_OSS_AVATAR_DIR:avatars}
+
+# MyBatis 日志默认关闭；排查 SQL 时可通过 UNITOUR_MYBATIS_LOG_IMPL 打开 StdOutImpl。
 mybatis:
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: ${UNITOUR_MYBATIS_LOG_IMPL:org.apache.ibatis.logging.nologging.NoLoggingImpl}
     map-underscore-to-camel-case: true

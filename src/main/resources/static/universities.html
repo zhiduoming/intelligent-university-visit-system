@@ -105,7 +105,7 @@
     const fallback = UniTour.escapeHtml((item.shortName || item.name || "U").slice(0, 2));
     const reviewCount = item.reviewCount || 0;
     const score = item.overallScore ? UniTour.formatScore(item.overallScore) : "-";
-    const focus = item.description || "暂无认知重点，后续可从校区、POI 和评价中继续补充。";
+    const focus = item.description || "可从校区、POI 和评价中继续了解这所高校。";
     const primaryTags = [
       item.is985 ? "985" : "",
       item.is211 ? "211" : "",

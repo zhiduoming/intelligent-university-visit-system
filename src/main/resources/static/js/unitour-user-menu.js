@@ -95,6 +95,12 @@
       UniTour.setToken("");
       renderMenu(container, null, false);
     }
+
+    window.addEventListener("unitour:user-updated", (event) => {
+      if (UniTour.token()) {
+        renderMenu(container, event.detail, true);
+      }
+    });
   }
 
   boot();

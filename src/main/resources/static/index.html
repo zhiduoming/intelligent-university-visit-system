@@ -52,7 +52,7 @@
     <div class="shell">
       <div class="section-head">
         <h2>从“高校名称”下钻到“校园生活”。</h2>
-        <p>参考产品官网的克制表达和高校库产品的信息密度，UniTour 首页把项目能力拆成清晰入口，而不是做一个只有展示没有跳转的封面。</p>
+        <p>围绕高校、校区、POI 和真实评价建立连续浏览路径，帮助你更快理解不同学校的校园体验。</p>
       </div>
 
       <div class="grid cols-3">
@@ -89,8 +89,8 @@
   <section class="section alt">
     <div class="shell">
       <div class="section-head">
-        <h2>当前演示数据。</h2>
-        <p>后端数据库已经补充到 20 所高校、35 个校区和 42 个 POI。页面会优先请求真实接口，接口不可用时才展示降级说明。</p>
+        <h2>当前数据概览。</h2>
+        <p>已收录多所高校、校区和校园 POI，并围绕宿舍、食堂、位置、学习氛围等维度沉淀评价信息。</p>
       </div>
       <div class="data-strip">
         <div class="stat-card"><strong id="stat-universities">20</strong><span>高校样本</span></div>
@@ -106,7 +106,7 @@
       <div>
         <div class="section-head">
           <h2>推荐先看的高校。</h2>
-          <p>这里直接调用高校列表接口，展示数据库中的前几所高校。点击卡片可以进入详情页。</p>
+          <p>从这些高校开始浏览，进入详情页后可以继续查看校区、POI、评分和评价内容。</p>
         </div>
         <div class="uni-list" id="home-universities">
           <div class="empty">正在加载高校数据...</div>
@@ -115,7 +115,7 @@
 
       <aside class="side-panel">
         <h3>核心入口</h3>
-        <p>前端不是单页截图，而是围绕你已有后端接口组织出的多页面演示。</p>
+        <p>从高校列表进入详情页，再结合校区 POI、评价区和个人资料完成完整使用流程。</p>
         <div class="grid">
           <a class="btn dark" href="/universities.html">高校列表与详情</a>
           <a class="btn line" href="/campus-pois.html">校区 POI 下钻</a>
@@ -129,7 +129,7 @@
 <footer class="footer">
   <div class="shell footer-inner">
     <span>UniTour · 高校多维认知与择校辅助系统</span>
-    <span>Built for backend interview demo</span>
+    <span>高校信息、校区差异与真实评价</span>
   </div>
 </footer>
 
@@ -164,7 +164,7 @@
       box.innerHTML = list.length ? list.map(card).join("") : `<div class="empty">暂无高校数据。</div>`;
       if (page?.total) document.querySelector("#stat-universities").textContent = page.total;
     } catch (error) {
-      box.innerHTML = `<div class="error">无法连接后端接口：${UniTour.escapeHtml(error.message)}。请确认 Spring Boot 已启动。</div>`;
+      box.innerHTML = `<div class="error">高校数据加载失败：${UniTour.escapeHtml(error.message)}。请稍后重试。</div>`;
     }
   }
 

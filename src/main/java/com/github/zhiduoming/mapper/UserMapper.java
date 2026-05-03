@@ -43,4 +43,9 @@ public interface UserMapper {
     int updatePasswordByUsernameAndPhone(@Param("username") String username,
                                          @Param("phone") String phone,
                                          @Param("password") String password);
+
+    /**
+     * 更新当前用户头像地址。
+     */
+    int updateAvatarUrl(@Param("id") Long userId, @Param("avatarUrl") String avatarUrl);
 }

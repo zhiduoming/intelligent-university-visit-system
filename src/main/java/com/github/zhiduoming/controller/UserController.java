@@ -8,10 +8,13 @@ import com.github.zhiduoming.vo.UserVO;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -43,6 +46,17 @@ public class UserController {
         log.info("完善个人资料");
         Long userId = (Long) request.getAttribute("userId");
         UserVO currentUser = userService.updateProfile(userId, dto);
+        return Result.success(currentUser);
+    }
+
+    /**
+     * 上传当前用户头像并返回最新用户资料。
+     */
+    @PostMapping("/me/avatar")
+    public Result updateAvatar(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+        log.info("更新用户头像");
+        Long userId = (Long) request.getAttribute("userId");
+        UserVO currentUser = userService.updateAvatar(userId, file);
         return Result.success(currentUser);
     }
 }

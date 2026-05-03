@@ -116,4 +116,12 @@
           AND status = 1
           AND is_deleted = 0
     </update>
+
+    <update id="updateAvatarUrl">
+        UPDATE users
+        SET avatar_url = #{avatarUrl}
+        WHERE id = #{id}
+          AND status = 1
+          AND is_deleted = 0
+    </update>
 </mapper>

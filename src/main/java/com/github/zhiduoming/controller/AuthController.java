@@ -3,6 +3,7 @@ package com.github.zhiduoming.controller;
 import com.github.zhiduoming.dto.ForgotPasswordDTO;
 import com.github.zhiduoming.dto.LoginDTO;
 import com.github.zhiduoming.dto.RegisterDTO;
+import com.github.zhiduoming.vo.CaptchaVO;
 import com.github.zhiduoming.vo.LoginVO;
 import com.github.zhiduoming.common.Result;
 import com.github.zhiduoming.service.AuthService;
@@ -19,6 +20,16 @@ public class AuthController {
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
+
+    /**
+     * 生成注册验证码，并返回本地演示需要的验证码内容。
+     */
+    @GetMapping("/register-captcha")
+    public Result registerCaptcha() {
+        CaptchaVO captchaVO = authService.generateRegisterCaptcha();
+        return Result.success(captchaVO);
+    }
+
 
     /**
      * 接收注册请求并调用认证服务完成用户注册。

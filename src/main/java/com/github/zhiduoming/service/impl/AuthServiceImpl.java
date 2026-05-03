@@ -1,22 +1,33 @@
 package com.github.zhiduoming.service.impl;
 
+import com.github.zhiduoming.common.RedisKeyConstants;
 import com.github.zhiduoming.dto.ForgotPasswordDTO;
 import com.github.zhiduoming.dto.LoginDTO;
 import com.github.zhiduoming.dto.RegisterDTO;
+import com.github.zhiduoming.vo.CaptchaVO;
 import com.github.zhiduoming.vo.LoginVO;
 import com.github.zhiduoming.mapper.UserMapper;
 import com.github.zhiduoming.pojo.User;
 import com.github.zhiduoming.service.AuthService;
 import com.github.zhiduoming.utils.JwtUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AuthServiceImpl implements AuthService {
+
+    private static final String CAPTCHA_SOURCE = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    private static final int CAPTCHA_LENGTH = 4;
+    private static final long CAPTCHA_TTL_SECONDS = 300L;
+    private static final SecureRandom RANDOM = new SecureRandom();
+
+
 
     private static final String PHONE_PATTERN = "^1[3-9]\\d{9}$";
 
@@ -24,10 +35,32 @@ public class AuthServiceImpl implements AuthService {
 
     private final BCryptPasswordEncoder passwordEncoder;
 
+    private final StringRedisTemplate stringRedisTemplate;
+
     //采用构造注入法
-    public AuthServiceImpl(UserMapper userMapper, BCryptPasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(UserMapper userMapper, BCryptPasswordEncoder passwordEncoder, StringRedisTemplate stringRedisTemplate) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.stringRedisTemplate = stringRedisTemplate;
+    }
+
+    /**
+     * 生成注册时所需验证码并将其保存在 Redis
+     *
+     */
+
+    @Override
+    public CaptchaVO generateRegisterCaptcha() {
+        String captchaId = UUID.randomUUID().toString();
+        String code = randomCaptchaCode();
+
+        stringRedisTemplate.opsForValue().set(
+                RedisKeyConstants.registerCaptchaKey(captchaId),
+                code,
+                CAPTCHA_TTL_SECONDS,
+                TimeUnit.SECONDS
+        );
+        return new CaptchaVO(captchaId,code,CAPTCHA_TTL_SECONDS);
     }
 
     /**
@@ -49,6 +82,8 @@ public class AuthServiceImpl implements AuthService {
         if (dto.getPassword() == null || dto.getPassword().length() < 6) {
             throw new RuntimeException("密码长度不能少于6位");
         }
+
+        checkRegisterCaptcha(dto.getCaptchaId(), dto.getCaptchaCode());
 
         //2.根据用户名去数据库查重
         User exists = userMapper.selectByUsername(username);
@@ -171,4 +206,32 @@ public class AuthServiceImpl implements AuthService {
         }
         return normalized;
     }
+    private String randomCaptchaCode() {
+        StringBuilder builder = new StringBuilder(CAPTCHA_LENGTH);
+        for (int i = 0; i < CAPTCHA_LENGTH; i++) {
+            builder.append(CAPTCHA_SOURCE.charAt(RANDOM.nextInt(CAPTCHA_SOURCE.length())));
+        }
+        return builder.toString();
+    }
+    private void checkRegisterCaptcha(String captchaId, String captchaCode) {
+        if (captchaId == null || captchaId.trim().isEmpty()) {
+            throw new RuntimeException("验证码标识不能为空");
+        }
+        if (captchaCode == null || captchaCode.trim().isEmpty()) {
+            throw new RuntimeException("验证码不能为空");
+        }
+
+        String key = RedisKeyConstants.registerCaptchaKey(captchaId.trim());
+        String cachedCode = stringRedisTemplate.opsForValue().get(key);
+
+        if (cachedCode == null) {
+            throw new RuntimeException("验证码已过期，请重新获取");
+        }
+        if (!cachedCode.equalsIgnoreCase(captchaCode.trim())) {
+            throw new RuntimeException("验证码不正确");
+        }
+
+        stringRedisTemplate.delete(key);
+    }
+
 }

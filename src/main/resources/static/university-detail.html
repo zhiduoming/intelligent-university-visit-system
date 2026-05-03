@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>高校详情 | UniTour</title>
-  <link rel="stylesheet" href="/css/unitour.css?v=20260503i">
+  <link rel="stylesheet" href="/css/unitour.css?v=20260503j">
 </head>
 <body>
 <header class="topbar">
@@ -22,79 +22,142 @@
 </header>
 
 <main id="app">
-  <section class="detail-hero">
-    <div class="shell">
-      <span class="eyebrow">University Detail</span>
-      <h1 id="uniName">正在加载高校详情...</h1>
-      <p id="uniDesc">请确认后端服务和数据库正在运行。</p>
-      <div class="actions">
-        <a class="btn line" href="/universities.html">返回高校库</a>
-        <a class="btn line" id="poiLink" href="/campus-pois.html">查看 POI</a>
-        <button class="btn primary" id="openReviewBtn" type="button">发表评价</button>
+  <section class="detail-hero detail-hero-premium">
+    <div class="shell detail-hero-grid">
+      <div class="detail-identity">
+        <div class="detail-logo detail-logo-hero" id="detailLogo">U</div>
+        <div>
+          <span class="eyebrow light">University Detail</span>
+          <h1 id="uniName">正在加载高校详情...</h1>
+          <p id="uniDesc">高校详情加载中，请稍后查看。</p>
+          <div class="detail-meta-line" id="uniMeta">地区、类型和办学层次加载中</div>
+          <div class="tags detail-tags" id="uniTags"></div>
+          <div class="actions detail-hero-actions">
+            <a class="btn line" href="/universities.html">返回高校库</a>
+            <a class="btn line" id="poiLink" href="/campus-pois.html">查看 POI</a>
+            <button class="btn primary" id="openReviewBtn" type="button">写评价</button>
+          </div>
+        </div>
       </div>
+
+      <aside class="detail-hero-panel">
+        <div>
+          <span>综合评分</span>
+          <strong id="summaryScore">-</strong>
+        </div>
+        <div class="detail-hero-stats">
+          <div><b id="summaryReviewCount">0</b><span>评价</span></div>
+          <div><b id="summaryCampusCount">0</b><span>校区</span></div>
+          <div><b id="summaryPoiCount">-</b><span>POI</span></div>
+        </div>
+        <a class="btn dark" id="officialLink" href="#" target="_blank" rel="noreferrer">学校官网</a>
+      </aside>
     </div>
   </section>
 
-  <section class="section">
-    <div class="shell detail-shell">
-      <section class="detail-summary-card">
-        <div class="detail-logo" id="detailLogo">U</div>
-        <div class="detail-main">
-          <h2 id="summaryName">高校名称</h2>
-          <div class="detail-meta">
-            <span id="uniMeta">地区、类型、标签和官网信息会在这里展示。</span>
-            <div class="tags" id="uniTags"></div>
-          </div>
-        </div>
-        <aside class="score-summary">
-          <div class="score-circle">
+  <section class="detail-signal-strip">
+    <div class="shell signal-grid">
+      <article>
+        <span>Campus</span>
+        <strong id="campusSignal">校区差异</strong>
+        <p>结合校区地址、热度和 POI 分布判断真实体验差异。</p>
+      </article>
+      <article>
+        <span>Life</span>
+        <strong id="lifeSignal">生活便利</strong>
+        <p>用宿舍、食堂、位置交通和校园环境衡量日常舒适度。</p>
+      </article>
+      <article>
+        <span>Study</span>
+        <strong id="studySignal">学习氛围</strong>
+        <p>关注学习氛围、就业支持和社团活动的综合反馈。</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="detail-dashboard-section">
+    <div class="shell detail-dashboard">
+      <div class="detail-content">
+        <section class="profile-card detail-block intro-card" id="intro">
+          <div class="detail-block-head">
             <div>
-              <strong id="summaryScore">-</strong>
-              <span>综合评分</span>
+              <span>Overview</span>
+              <h2>学校简介</h2>
+            </div>
+            <p>先看学校定位，再进入校区和评价细节。</p>
+          </div>
+          <p id="introText">正在加载学校简介...</p>
+        </section>
+
+        <section class="profile-card detail-block" id="ratings">
+          <div class="detail-block-head">
+            <div>
+              <span>Ratings</span>
+              <h2>细分维度评分</h2>
+            </div>
+            <p>评分来自已发布的带评分评价，纯文字评价不参与均分。</p>
+          </div>
+          <div class="rating-card-grid premium-rating-grid" id="ratingBox"></div>
+        </section>
+
+        <section class="profile-card detail-block" id="campuses">
+          <div class="detail-block-head">
+            <div>
+              <span>Campuses</span>
+              <h2>校区信息</h2>
+            </div>
+            <p>不同校区的地址、生活便利度和 POI 分布可能差异很大。</p>
+          </div>
+          <div class="campus-list premium-campus-list" id="campusList"></div>
+        </section>
+
+        <section class="profile-card detail-block" id="reviews">
+          <div class="review-toolbar premium-review-toolbar">
+            <div>
+              <span>Reviews</span>
+              <h2>评价列表</h2>
+              <p>结合维度评分、文字内容和回复，判断更具体的校园体验。</p>
+            </div>
+            <div class="actions">
+              <button class="btn line" id="reloadReviewsBtn" type="button">刷新评价</button>
+              <button class="btn primary" id="openReviewBtn2" type="button">写评价</button>
             </div>
           </div>
-          <span id="summaryReviewCount" style="color:var(--muted);font-weight:800">0 条评价</span>
-          <a class="btn line" id="officialLink" href="#" target="_blank" rel="noreferrer">学校官网</a>
-        </aside>
-      </section>
+          <div class="review-list premium-review-list" id="reviewList"></div>
+        </section>
+      </div>
 
-      <section class="profile-card intro-card">
-        <div class="section-head" style="margin-bottom:16px">
-          <h2>学校简介</h2>
-          <p>基础介绍单独展示，避免和评分、评论挤在一起。</p>
-        </div>
-        <p id="introText">正在加载学校简介...</p>
-      </section>
-
-      <section class="profile-card">
-        <div class="section-head" style="margin-bottom:16px">
-          <h2>细分维度评分</h2>
-          <p>该评分来自已发布的带评分评价，纯文字评价不参与均分。</p>
-        </div>
-        <div class="rating-card-grid" id="ratingBox"></div>
-      </section>
-
-      <section class="profile-card">
-        <div class="section-head" style="margin-bottom:16px">
-          <h2>校区信息</h2>
-          <p>校区是理解高校体验的关键，不同校区的地址、生活便利度和 POI 可能差异很大。</p>
-        </div>
-        <div class="campus-list" id="campusList"></div>
-      </section>
-
-      <section class="profile-card" id="reviews">
-        <div class="review-toolbar">
-          <div>
-            <h2 style="margin-bottom:6px">评价列表</h2>
-            <p style="margin:0;color:var(--muted)">评分评价会展示维度星级；仅文字评价只展示评论内容。</p>
+      <aside class="detail-sidebar">
+        <section class="detail-side-card">
+          <span>当前高校</span>
+          <h2 id="summaryName">高校名称</h2>
+          <p id="sideLocation">地区与办学信息加载中</p>
+          <div class="side-score">
+            <strong id="sideScore">-</strong>
+            <span>综合评分</span>
           </div>
-          <div class="actions">
-            <button class="btn line" id="reloadReviewsBtn" type="button">刷新评价</button>
-            <button class="btn primary" id="openReviewBtn2" type="button">写评价</button>
+        </section>
+
+        <section class="detail-side-card">
+          <h3>快速查看</h3>
+          <nav class="quick-nav">
+            <a href="#intro">学校简介</a>
+            <a href="#ratings">细分评分</a>
+            <a href="#campuses">校区信息</a>
+            <a href="#reviews">评价列表</a>
+          </nav>
+        </section>
+
+        <section class="detail-side-card">
+          <h3>关键事实</h3>
+          <div class="fact-list">
+            <div><span>高校类型</span><b id="sideType">-</b></div>
+            <div><span>办学层次</span><b id="sideLevel">-</b></div>
+            <div><span>校区数量</span><b id="sideCampusCount">0</b></div>
+            <div><span>评价数量</span><b id="sideReviewCount">0</b></div>
           </div>
-        </div>
-        <div class="review-list" id="reviewList"></div>
-      </section>
+        </section>
+      </aside>
     </div>
   </section>
 </main>
@@ -148,7 +211,7 @@
 <footer class="footer">
   <div class="shell footer-inner">
     <span>UniTour · 高校详情</span>
-    <span>Detail, campus, reviews</span>
+    <span>高校详情、校区信息与真实评价</span>
   </div>
 </footer>
 
@@ -178,13 +241,38 @@
   function scoreRows(rating) {
     return scoreDefs.map(([key, name]) => {
       const value = rating?.[key];
+      const score = Number(value || 0);
+      const width = Math.max(0, Math.min(100, score * 20));
       return `
-        <div class="rating-card">
-          <span>${name}</span>
-          <strong>${UniTour.formatScore(value)}</strong>
+        <div class="rating-card premium-rating-card">
+          <div class="rating-card-top">
+            <span>${name}</span>
+            <strong>${UniTour.formatScore(value)}</strong>
+          </div>
+          <div class="rating-meter" aria-hidden="true"><i style="width:${width}%"></i></div>
+          <p>${ratingHint(name, score)}</p>
         </div>
       `;
     }).join("");
+  }
+
+  function ratingHint(name, score) {
+    if (!score) return "等待更多评价补充。";
+    if (score >= 4.6) return `${name}反馈突出。`;
+    if (score >= 4.0) return `${name}整体稳定。`;
+    if (score >= 3.2) return `${name}评价分化。`;
+    return `${name}需要重点关注。`;
+  }
+
+  async function countPois(campusList) {
+    const campuses = campusList || [];
+    if (!campuses.length) return 0;
+    try {
+      const lists = await Promise.all(campuses.map((campus) => UniTour.campusPois(campus.id)));
+      return lists.reduce((sum, list) => sum + (Array.isArray(list) ? list.length : 0), 0);
+    } catch {
+      return null;
+    }
   }
 
   function iconUrl(item) {
@@ -266,16 +354,23 @@
   }
 
   function campusCard(campus) {
+    const hotScore = Number(campus.hotScore || 0);
+    const heatWidth = Math.max(0, Math.min(100, hotScore));
     return `
-      <article class="campus-card">
-        <h3>${UniTour.escapeHtml(campus.name)}</h3>
-        <p>${UniTour.escapeHtml(campus.address || "地址暂未维护")}</p>
-        <div class="tags">
-          <span class="tag">热度 ${campus.hotScore || 0}</span>
-          <span class="tag">校区 ID ${campus.id}</span>
+      <article class="campus-card premium-campus-card">
+        <div class="campus-map" aria-hidden="true">
+          <span></span><i></i><b></b>
         </div>
-        <div class="card-actions">
-          <a class="btn line" href="/campus-pois.html?universityId=${state.detail.id}&campusId=${campus.id}">查看 POI</a>
+        <div class="campus-card-main">
+          <div class="campus-card-head">
+            <h3>${UniTour.escapeHtml(campus.name)}</h3>
+            <span class="tag">热度 ${hotScore}</span>
+          </div>
+          <p>${UniTour.escapeHtml(campus.address || "地址待补充")}</p>
+          <div class="campus-meter"><i style="width:${heatWidth}%"></i></div>
+          <div class="card-actions">
+            <a class="btn line" href="/campus-pois.html?universityId=${state.detail.id}&campusId=${campus.id}">查看 POI</a>
+          </div>
         </div>
       </article>
     `;
@@ -325,9 +420,13 @@
         <div class="comment-head">
           <div class="user-line">
             <span class="avatar">人</span>
-            <span>${UniTour.escapeHtml(review.nickname || "匿名用户")}</span>
-            <span class="tag">${review.campusName ? UniTour.escapeHtml(review.campusName) : "全校评价"}</span>
-            ${hasScore(review) ? `<span class="tag hot">综合 ${UniTour.formatScore(review.overallScore)}</span>` : `<span class="tag">仅文字</span>`}
+            <div class="review-user-stack">
+              <strong>${UniTour.escapeHtml(review.nickname || "匿名用户")}</strong>
+              <div>
+                <span class="tag">${review.campusName ? UniTour.escapeHtml(review.campusName) : "全校评价"}</span>
+                ${hasScore(review) ? `<span class="tag hot">综合 ${UniTour.formatScore(review.overallScore)}</span>` : `<span class="tag">文字评价</span>`}
+              </div>
+            </div>
           </div>
           <div class="comment-meta">
             <span>${UniTour.escapeHtml(String(review.createTime || "").replace("T", " "))}</span>
@@ -335,7 +434,7 @@
           </div>
         </div>
         ${reviewScoreGrid(review)}
-        <p style="font-size:1.02rem;margin-bottom:0">${UniTour.escapeHtml(review.content)}</p>
+        <p class="review-content">${UniTour.escapeHtml(review.content)}</p>
         <div class="comment-actions">
           <button class="icon-action ${review.likedByCurrentUser ? "liked" : ""}" data-like="${review.id}" type="button" aria-label="点赞">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -410,7 +509,18 @@
       $("#poiLink").href = `/campus-pois.html?universityId=${detail.id}`;
       $("#uniMeta").textContent = `${detail.province || "-"} · ${detail.city || "-"} / ${detail.schoolType || "高校"} / ${detail.educationLevel || "本科"}`;
       $("#summaryScore").textContent = UniTour.formatScore(detail.rating?.overallScore);
-      $("#summaryReviewCount").textContent = `${detail.rating?.reviewCount || 0} 条评价`;
+      $("#sideScore").textContent = UniTour.formatScore(detail.rating?.overallScore);
+      $("#summaryReviewCount").textContent = detail.rating?.reviewCount || 0;
+      $("#summaryCampusCount").textContent = (detail.campusList || []).length;
+      $("#summaryPoiCount").textContent = "-";
+      $("#sideReviewCount").textContent = `${detail.rating?.reviewCount || 0} 条`;
+      $("#sideCampusCount").textContent = `${(detail.campusList || []).length} 个`;
+      $("#sideLocation").textContent = `${detail.province || "-"} · ${detail.city || "-"} · ${detail.schoolType || "高校"}`;
+      $("#sideType").textContent = detail.schoolType || "高校";
+      $("#sideLevel").textContent = detail.educationLevel || "本科";
+      $("#campusSignal").textContent = `${(detail.campusList || []).length || "-"} 个校区`;
+      $("#lifeSignal").textContent = `生活 ${UniTour.formatScore(detail.rating?.canteenScore || detail.rating?.campusScore)}`;
+      $("#studySignal").textContent = `学习 ${UniTour.formatScore(detail.rating?.studyScore)}`;
       $("#officialLink").href = detail.officialWebsite || detail.logoUrl || "#";
       const favicon = iconUrl(detail);
       const fallback = UniTour.escapeHtml((detail.shortName || detail.name || "U").slice(0, 2));
@@ -425,6 +535,9 @@
       ].map((tag) => `<span class="tag ${tag.includes("985") || tag.includes("211") || tag.includes("双一流") ? "hot" : ""}">${UniTour.escapeHtml(tag)}</span>`).join("");
       $("#ratingBox").innerHTML = scoreRows(detail.rating);
       $("#campusList").innerHTML = (detail.campusList || []).map(campusCard).join("") || `<div class="empty">暂无校区数据。</div>`;
+      countPois(detail.campusList).then((count) => {
+        $("#summaryPoiCount").textContent = count === null ? "-" : count;
+      });
       $("#reviewCampus").innerHTML = `<option value="">不指定校区，评价全校</option>` + (detail.campusList || [])
         .map((campus) => `<option value="${campus.id}">${UniTour.escapeHtml(campus.name)}</option>`)
         .join("");

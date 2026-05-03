@@ -3,6 +3,7 @@ package com.github.zhiduoming.service;
 import com.github.zhiduoming.dto.LoginDTO;
 import com.github.zhiduoming.dto.ForgotPasswordDTO;
 import com.github.zhiduoming.dto.RegisterDTO;
+import com.github.zhiduoming.vo.CaptchaVO;
 import com.github.zhiduoming.vo.LoginVO;
 
 public interface AuthService {
@@ -20,4 +21,9 @@ public interface AuthService {
      * 通过用户名和绑定手机号校验身份后重置密码。
      */
     void resetPassword(ForgotPasswordDTO dto);
+
+    /**
+     * 生成注册时所需验证码并临时保存到 Redis
+     */
+    CaptchaVO generateRegisterCaptcha();
 }

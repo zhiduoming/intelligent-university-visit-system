@@ -4,11 +4,13 @@ import com.github.zhiduoming.dto.UpdateProfileDTO;
 import com.github.zhiduoming.mapper.UniversityMapper;
 import com.github.zhiduoming.mapper.UserMapper;
 import com.github.zhiduoming.pojo.User;
+import com.github.zhiduoming.service.OssUploadService;
 import com.github.zhiduoming.service.UserService;
 import com.github.zhiduoming.vo.UniversityDetailVO;
 import com.github.zhiduoming.vo.UniversityListVO;
 import com.github.zhiduoming.vo.UserVO;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,10 +19,12 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
     private final UniversityMapper universityMapper;
+    private final OssUploadService ossUploadService;
 
-    public UserServiceImpl(UserMapper userMapper, UniversityMapper universityMapper) {
+    public UserServiceImpl(UserMapper userMapper, UniversityMapper universityMapper, OssUploadService ossUploadService) {
         this.userMapper = userMapper;
         this.universityMapper = universityMapper;
+        this.ossUploadService = ossUploadService;
     }
 
     /**
@@ -79,6 +83,25 @@ public class UserServiceImpl implements UserService {
         int rows = userMapper.updateProfile(updateUser);
         if (rows != 1) {
             throw new RuntimeException("资料更新失败");
+        }
+
+        User latestUser = userMapper.selectById(userId);
+        checkUserAvailable(latestUser);
+        return buildUserVO(latestUser);
+    }
+
+    /**
+     * 上传头像到 OSS，并把公开访问 URL 写回用户表。
+     */
+    @Override
+    public UserVO updateAvatar(Long userId, MultipartFile file) {
+        User user = userMapper.selectById(userId);
+        checkUserAvailable(user);
+
+        String avatarUrl = ossUploadService.uploadAvatar(userId, file);
+        int rows = userMapper.updateAvatarUrl(userId, avatarUrl);
+        if (rows != 1) {
+            throw new RuntimeException("头像更新失败");
         }
 
         User latestUser = userMapper.selectById(userId);

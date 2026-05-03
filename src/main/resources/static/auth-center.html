@@ -98,7 +98,7 @@
         </div>
         <button class="btn primary" id="forgotBtn" type="button" style="width:100%;font-size:1.08rem">重置密码</button>
         <div class="token-box" id="forgotMsg"></div>
-        <div class="auth-divider">当前版本使用绑定手机号辅助验证，不接入短信验证码。</div>
+        <div class="auth-divider">使用绑定手机号辅助验证身份。</div>
       </section>
     </div>
   </section>
@@ -107,15 +107,16 @@
 <footer class="footer">
   <div class="shell footer-inner">
     <span>UniTour · 认证中心</span>
-    <span>JWT stored in localStorage</span>
+    <span>账号登录与资料入口</span>
   </div>
 </footer>
 
-<script src="/js/unitour-api.js?v=20260503f"></script>
+<script src="/js/unitour-api.js?v=20260503g"></script>
 <script src="/js/unitour-user-menu.js?v=20260503e"></script>
 <script>
   const $ = (id) => document.querySelector(id);
   const redirect = UniTour.qs("redirect") || "/user-center.html";
+  let registerCaptcha = null;
 
   function switchTab(name) {
     document.querySelectorAll("[data-auth-tab]").forEach((button) => {
@@ -124,11 +125,6 @@
     $("#loginForm").classList.toggle("active", name === "login");
     $("#registerForm").classList.toggle("active", name === "register");
     $("#forgotForm").classList.toggle("active", name === "forgot");
-  }
-
-  function captchaText() {
-    const source = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    return Array.from({ length: 4 }, () => source[Math.floor(Math.random() * source.length)]).join("");
   }
 
   document.querySelectorAll("[data-auth-tab]").forEach((button) => {
@@ -144,9 +140,20 @@
     });
   });
 
-  $("#captchaBox").addEventListener("click", () => {
-    $("#captchaBox").textContent = captchaText();
-  });
+  async function refreshRegisterCaptcha() {
+    $("#captchaBox").textContent = "获取中";
+    try {
+      registerCaptcha = await UniTour.registerCaptcha();
+      $("#captchaBox").textContent = registerCaptcha.code;
+      $("#captchaInput").value = "";
+    } catch (error) {
+      registerCaptcha = null;
+      $("#captchaBox").textContent = "重试";
+      $("#registerMsg").textContent = `验证码获取失败：${error.message}`;
+    }
+  }
+
+  $("#captchaBox").addEventListener("click", refreshRegisterCaptcha);
 
   $("#forgotLink").addEventListener("click", () => {
     $("#forgotUsername").value = $("#loginUsername").value.trim();
@@ -177,8 +184,13 @@
   $("#registerBtn").addEventListener("click", async () => {
     $("#registerMsg").textContent = "正在注册...";
     const captcha = $("#captchaInput").value.trim();
-    if (captcha && captcha.toLowerCase() !== $("#captchaBox").textContent.trim().toLowerCase()) {
-      $("#registerMsg").textContent = "验证码不正确。当前验证码只做前端占位，后续可以接后端接口。";
+    if (!registerCaptcha || !registerCaptcha.captchaId) {
+      $("#registerMsg").textContent = "请先获取验证码。";
+      await refreshRegisterCaptcha();
+      return;
+    }
+    if (!captcha) {
+      $("#registerMsg").textContent = "请输入验证码。";
       return;
     }
     try {
@@ -186,13 +198,16 @@
         username: $("#registerUsername").value.trim(),
         phone: $("#registerPhone").value.trim(),
         nickname: $("#registerNickname").value.trim(),
-        password: $("#registerPassword").value
+        password: $("#registerPassword").value,
+        captchaId: registerCaptcha.captchaId,
+        captchaCode: captcha
       });
       $("#registerMsg").textContent = "注册成功，现在可以登录。";
       switchTab("login");
       $("#loginUsername").value = $("#registerUsername").value.trim();
     } catch (error) {
       $("#registerMsg").textContent = `注册失败：${error.message}`;
+      await refreshRegisterCaptcha();
     }
   });
 
@@ -212,6 +227,8 @@
       $("#forgotMsg").textContent = `重置失败：${error.message}`;
     }
   });
+
+  refreshRegisterCaptcha();
 </script>
 </body>
 </html>

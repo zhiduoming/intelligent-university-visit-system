@@ -36,14 +36,15 @@ const UniTour = (() => {
       ...(options.headers || {})
     };
 
-    if (options.body && !headers["Content-Type"]) {
+    const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
+    if (options.body && !isFormData && !headers["Content-Type"]) {
       headers["Content-Type"] = "application/json";
     }
 
     const response = await fetch(`${API_PREFIX}${path}`, {
       ...options,
       headers,
-      body: options.body && typeof options.body !== "string" ? JSON.stringify(options.body) : options.body
+      body: options.body && !isFormData && typeof options.body !== "string" ? JSON.stringify(options.body) : options.body
     });
 
     const payload = await response.json().catch(() => null);
@@ -104,6 +105,10 @@ const UniTour = (() => {
     return request("/auth/register", { method: "POST", body });
   }
 
+  function registerCaptcha() {
+    return request("/auth/register-captcha");
+  }
+
   function forgotPassword(body) {
     return request("/auth/forgot-password", { method: "POST", body });
   }
@@ -114,6 +119,12 @@ const UniTour = (() => {
 
   function updateProfile(body) {
     return request("/users/me/profile", { method: "PUT", body });
+  }
+
+  function uploadAvatar(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    return request("/users/me/avatar", { method: "POST", body: formData });
   }
 
   function qs(name) {
@@ -177,9 +188,11 @@ const UniTour = (() => {
     unlikeReview,
     login,
     register,
+    registerCaptcha,
     forgotPassword,
     me,
     updateProfile,
+    uploadAvatar,
     token,
     setToken,
     qs,

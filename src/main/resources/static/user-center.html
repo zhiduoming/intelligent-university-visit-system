@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>用户中心 | UniTour</title>
-  <link rel="stylesheet" href="/css/unitour.css?v=20260503i">
+  <link rel="stylesheet" href="/css/unitour.css?v=20260503j">
 </head>
 <body>
 <header class="topbar">
@@ -26,7 +26,7 @@
     <div class="shell">
       <span class="eyebrow" style="color:var(--teal-2);border-color:var(--line);background:#fffdf8">User Center</span>
       <h1>个人资料和学校身份信息集中展示。</h1>
-      <p>这里调用当前用户接口，展示账号、昵称、身份、目标高校、当前高校和资料完善状态。后续学校认证、退出登录接口也可以从这里继续扩展。</p>
+      <p>查看账号、昵称、身份、目标高校、当前高校和资料完善状态。</p>
     </div>
   </section>
 
@@ -34,6 +34,9 @@
     <div class="shell center-shell">
       <aside class="profile-card profile-summary">
         <div class="profile-avatar" id="profileAvatar">U</div>
+        <input id="avatarFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+        <button class="btn line avatar-upload-btn" id="avatarUploadBtn" type="button" disabled>更换头像</button>
+        <p class="avatar-upload-hint" id="avatarMsg">支持 JPG、PNG、WEBP、GIF，最大 2MB。</p>
         <div>
           <h2 id="profileName" style="margin-bottom:4px">未登录</h2>
           <p id="profileStatus" style="margin:0;color:var(--muted)">请先登录后查看资料。</p>
@@ -66,7 +69,7 @@
     <div class="modal-head">
       <div>
         <h2 id="profileModalTitle">编辑资料</h2>
-        <p>高校名称会由后端解析成高校 ID 后保存。</p>
+        <p>输入学校名称后保存，系统会匹配对应高校信息。</p>
       </div>
       <button class="close-btn" id="closeProfileModal" type="button" aria-label="关闭编辑资料弹窗">×</button>
     </div>
@@ -100,11 +103,11 @@
 <footer class="footer">
   <div class="shell footer-inner">
     <span>UniTour · 用户中心</span>
-    <span>Profile and verification placeholder</span>
+    <span>个人资料与评价身份</span>
   </div>
 </footer>
 
-<script src="/js/unitour-api.js?v=20260503e"></script>
+<script src="/js/unitour-api.js?v=20260503g"></script>
 <script src="/js/unitour-user-menu.js?v=20260503e"></script>
 <script>
   const $ = (selector) => document.querySelector(selector);
@@ -167,6 +170,7 @@
     $("#profileAvatar").innerHTML = user.avatarUrl
       ? `<img src="${UniTour.escapeHtml(user.avatarUrl)}" alt="">`
       : UniTour.escapeHtml(name.slice(0, 1).toUpperCase());
+    $("#avatarMsg").textContent = "支持 JPG、PNG、WEBP、GIF，最大 2MB。";
 
     $("#profileInfo").innerHTML = [
       infoItem("用户 ID", user.id),
@@ -190,6 +194,7 @@
       $("#loginLink").style.display = "inline-flex";
       $("#profileBtn").disabled = true;
       $("#editProfileBtn").disabled = true;
+      $("#avatarUploadBtn").disabled = true;
       $("#editProfileBtn").textContent = "完善资料";
       return;
     }
@@ -197,6 +202,7 @@
     $("#loginLink").style.display = "none";
     $("#profileBtn").disabled = false;
     $("#editProfileBtn").disabled = false;
+    $("#avatarUploadBtn").disabled = false;
     try {
       const data = await UniTour.me();
       renderUser(data);
@@ -204,6 +210,7 @@
       $("#profileInfo").innerHTML = `<div class="error">读取失败：${UniTour.escapeHtml(error.message)}</div>`;
       $("#profileBtn").disabled = true;
       $("#editProfileBtn").disabled = true;
+      $("#avatarUploadBtn").disabled = true;
     }
   }
 
@@ -213,6 +220,30 @@
   });
 
   $("#editProfileBtn").addEventListener("click", openProfileModal);
+  $("#avatarUploadBtn").addEventListener("click", () => {
+    if (!UniTour.token()) {
+      location.href = "/auth-center.html?redirect=/user-center.html";
+      return;
+    }
+    $("#avatarFile").click();
+  });
+  $("#avatarFile").addEventListener("change", async () => {
+    const file = $("#avatarFile").files?.[0];
+    if (!file) return;
+    $("#avatarMsg").textContent = "正在上传头像...";
+    $("#avatarUploadBtn").disabled = true;
+    try {
+      const data = await UniTour.uploadAvatar(file);
+      renderUser(data);
+      window.dispatchEvent(new CustomEvent("unitour:user-updated", { detail: data }));
+      $("#avatarMsg").textContent = "头像已更新。";
+    } catch (error) {
+      $("#avatarMsg").textContent = `头像上传失败：${error.message}`;
+    } finally {
+      $("#avatarUploadBtn").disabled = false;
+      $("#avatarFile").value = "";
+    }
+  });
   $("#closeProfileModal").addEventListener("click", closeProfileModal);
   $("#cancelProfileBtn").addEventListener("click", closeProfileModal);
   $("#profileModal").addEventListener("click", (event) => {
